@@ -8,8 +8,8 @@ Marina Olvera Martínez
 
 ## Guia de ejecuccion
 
-Descargar los archivos del s1, s3 y el s6 en root y extraerlos.
-Ejecutar los archivos en el siguiente orden, programas con el mismo numero pueden ser corridos en paralelo:
+Descargar los archivos del s1, s3 y el s6 con el botón de "Descarga todos los datos" en root y extraerlos.
+Ejecutar los archivos en el siguiente orden, programas con el mismo número pueden ser corridos en paralelo:
 
 1\. procesar_s1.ipynb  
 1\. procesar_s6_pandas.ipynb  
@@ -19,7 +19,7 @@ Ejecutar los archivos en el siguiente orden, programas con el mismo numero puede
 3\. cruzar_s1_s3.ipynb -> posesion_durante_inhabilitacion_IntegriDAT.xlsx  
 3\. cruzar_s6_s3.ipynb -> contrato_durante_inhabilitacion_IntegriDAT.xlsx  
 
-Despues de correr los archivos la estructura del directorio quedara parecido a esto, notece que las carpetas del S6, S1 y S3 tienen que ser extraidas previamente:
+Después de correr los archivos la estructura del directorio quedara parecido a esto, note que las carpetas del S6, S1 y S3 tienen que ser extraídas previamente:
 
 ├───bulk-s6  
 │  
@@ -49,8 +49,8 @@ s6_parquet.h5
 
 ## Reportes generados
 
-Despues de ejecutar los archivos de python se generan los siguientes reportes con posibles casos de corrupción indebida.
-Se pueden encontrar en Drive con su Diccionario de datos en una de las hojas.
+Después de ejecutar los archivos de python se generan los siguientes reportes con posibles casos de corrupción indebida.
+Se pueden encontrar en Drive con su diccionario de datos en una de las hojas.
 
 ### posesion_durante_inhabilitacion_IntegriDAT.xlsx
 
