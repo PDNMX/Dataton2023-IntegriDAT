@@ -18,3 +18,33 @@ Ejecutar los archivos en el siguiente orden, programas con el mismo numero puede
 2\. procesar_declaraciones.ipynb  
 3\. cruzar_s1_s3.ipynb -> posesion_durante_inhabilitacion_IntegriDAT.xlsx  
 3\. cruzar_s6_s3.ipynb -> contrato_durante_inhabilitacion_IntegriDAT.xlsx  
+
+Despues de correr los archivos la estructura del directorio quedara parecido a esto:
+
+├───bulk-s6  
+│  
+├───s1  
+│
+├───s2  
+│  
+├───s3p  
+│  
+├───s3s    
+contrato_durante_inhabilitacion_IntegriDAT.xlsx  
+cruzar_s1_s3.ipynb  
+cruzar_s6_s3.ipynb   
+generar-periodos-invalidacion.ipynb  
+inhabilitaciones.pkl  
+posesion_durante_inhabilitacion_IntegriDAT.xlsx  
+procesar_declaraciones.ipynb  
+procesar_fechas_s6.ipynb  
+procesar_s1.ipynb  
+procesar_s6.ipynb  
+procesar_s6_pandas.ipynb  
+requirements.txt  
+s1_declaracion.pkl  
+s1_df_raw.pkl  
+s1_fecha_toma_posesion.h5  
+s6_hdf.h5  
+s6_hdf_dates.h5  
+s6_parquet.h5
