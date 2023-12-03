@@ -166,3 +166,4 @@ s3s/*
 *.pkl
 s2/*
 *.h5
+s6_extracted/*
