@@ -24,7 +24,7 @@ Despues de correr los archivos la estructura del directorio quedara parecido a e
 ├───bulk-s6  
 │  
 ├───s1  
-│
+│  
 ├───s2  
 │  
 ├───s3p  
