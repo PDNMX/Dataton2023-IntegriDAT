@@ -167,3 +167,5 @@ s3s/*
 s2/*
 *.h5
 s6_extracted/*
+s6_extracted_small/*
+*.parquet
