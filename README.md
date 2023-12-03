@@ -8,7 +8,8 @@ Marina Olvera Martínez
 
 ## Guia de ejecuccion
 
-Descargar los archivos del s1, s3 y el s6 con el botón de "Descarga todos los datos" en root y extraerlos.
+Descargar los archivos del s1, s3 y el s6 con el botón de "Descarga todos los datos" en root y extraerlos.  
+Utilizar venv y requirements.txt para levantar el ambiente de python, puede consultar [esta guía](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/).  
 Ejecutar los archivos en el siguiente orden, programas con el mismo número pueden ser corridos en paralelo:
 
 1\. procesar_s1.ipynb  
