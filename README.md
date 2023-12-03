@@ -49,6 +49,8 @@ s6_parquet.h5
 
 ## Reportes generados
 
+Despues de ejecutar los archivos de python se generan los siguientes reportes con posibles casos de corrupción indebida.
+Se pueden encontrar en Drive con su Diccionario de datos en una de las hojas.
 
 ### posesion_durante_inhabilitacion_IntegriDAT.xlsx
 
