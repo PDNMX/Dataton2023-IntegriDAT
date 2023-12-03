@@ -8,7 +8,7 @@ Marina Olvera Martínez
 
 ## Guia de ejecuccion
 
-Descargar los archivos del s1, s3 y el s6 en root.
+Descargar los archivos del s1, s3 y el s6 en root y extraerlos.
 Ejecutar los archivos en el siguiente orden, programas con el mismo numero pueden ser corridos en paralelo:
 
 1\. procesar_s1.ipynb  
@@ -19,7 +19,7 @@ Ejecutar los archivos en el siguiente orden, programas con el mismo numero puede
 3\. cruzar_s1_s3.ipynb -> posesion_durante_inhabilitacion_IntegriDAT.xlsx  
 3\. cruzar_s6_s3.ipynb -> contrato_durante_inhabilitacion_IntegriDAT.xlsx  
 
-Despues de correr los archivos la estructura del directorio quedara parecido a esto:
+Despues de correr los archivos la estructura del directorio quedara parecido a esto, notece que las carpetas del S6, S1 y S3 tienen que ser extraidas previamente:
 
 ├───bulk-s6  
 │  
