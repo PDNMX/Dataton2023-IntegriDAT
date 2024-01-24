@@ -13,8 +13,6 @@ from itertools import islice
 from pprint import pprint
 from time import sleep
 
-pprint("Importando datos en remake s6")
-
 def parse_date(x):
     try:
         return parse(x)
@@ -49,6 +47,26 @@ def convert_files_parquet_h5(df, directorio_salida, nombre_archivo, i):
         df.to_hdf(directorio_salida +str(nombre_archivo) + "_s6_hdf_" + str(i) + ".h5", key = "s6_df")
 
 
+def extraer_S6(df):
+    keep_cols = ['_id', "ocid", "id", "parties", "awards"]
+    df = df[keep_cols]
+    #pprint(df.shape)
+    #pprint(df.columns)
+    res = df.awards.progress_apply(find_dates_no_processing)
+    #pprint(res)
+    df["contractPeriod_startDate"], df["contractPeriod_endDate"] = zip(*res)
+    df = df.drop(columns=["awards"])
+    #pprint(df.columns)
+    #pprint(s6_df.head())
+    df = df.explode("parties")
+    res_contact = df.parties.map(extract_parties_names)
+    #pprint(res_contact)
+    df["parties_name"], df["parties_contactPoint_name"] = zip(*res_contact)
+    df = df.drop(columns=["parties"])
+    df = df.reset_index(drop = True)
+    #pprint(df)
+    return df
+
 
 ### Leer por carpeta o directorio y nombre de archivo o json
 ### Se iterqa sobre el directorio
@@ -79,7 +97,8 @@ for i in range(len(ruta_bulk_s6)):
             #print(df.shape)
             nombre_archivo = lista_directorio[j].split(".")[0]
             print(nombre_archivo)
-            #convert_files_parquet(df, salida, nombre_archivo, x)
+            df = extraer_S6(df)
+            convert_files_parquet_h5(df, salida, nombre_archivo, x)
             x+=1
     if os.path.isfile('bulk-s6/'+ruta_bulk_s6[i]) == True:
         #print("es un archivo")
