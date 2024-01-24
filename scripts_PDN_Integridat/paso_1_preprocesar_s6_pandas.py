@@ -57,6 +57,14 @@ def convert_files_parquet_h5(df, directorio_salida, nombre_archivo, i):
         nombre_archivo = nombre_archivo.split(".")[0]
         df.to_hdf(directorio_salida +str(nombre_archivo) + "_s6_hdf_" + str(i) + ".h5", key = "s6_df")
 
+def convert_files_h5_parquet(df, directorio_salida, nombre_archivo, i):
+    try:
+        nombre_archivo = nombre_archivo.split(".")[0]
+        df.to_hdf(directorio_salida +str(nombre_archivo) + "_s6_hdf_" + str(i) + ".h5", key = "s6_df")
+    except Exception as e:
+        nombre_archivo = nombre_archivo.split(".")[0]
+        df.to_parquet(directorio_salida+str(nombre_archivo)+"_parquet_" + str(i) + ".parquet")
+
 
 ### Leer por carpeta o directorio y nombre de archivo o json
 ### Se iterqa sobre el directorio
@@ -66,7 +74,7 @@ salida_preprocesamiento_s6 = '../salida_paso1_s6_pandas/'
 pprint(ruta_bulk_s6_nombres)
 
 for i in range(len(contenido_ruta_bulk_s6)):
-    print("Iteracion: ", i)
+    #print("Iteracion: ", i)
     ##solo para listar lo que se itera
     ##print("Archivo: ", contenido_ruta_bulk_s6[i])
     if os.path.isfile(ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i]) == True:
@@ -76,12 +84,14 @@ for i in range(len(contenido_ruta_bulk_s6)):
         ruta_archivo = ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i]
         #rint("Ruta archivo: ", ruta_archivo)
         df = pd.read_json(ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i])
-        pprint(df.shape)
+        #pprint(df.shape)
         df = extraer_S6(df)
         convert_files_parquet_h5(df, salida_preprocesamiento_s6, nombre_archivo, i)
+        ##convert_files_h5_parquet(df, salida_preprocesamiento_s6, nombre_archivo, i)
+
     if os.path.isdir(ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i]) == True:
         pass
-        print("Es un directorio")
+        #print("Es un directorio")
         ## listar el contenido del subdirectorio
         contenido_subdirectorio = os.listdir(ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i])
         x=0
@@ -91,9 +101,12 @@ for i in range(len(contenido_ruta_bulk_s6)):
             #print("Archivo: ", contenido_subdirectorio[j])
             nombre_archivo_subdirectorio = ruta_bulk_s6_nombres +'/'+ contenido_ruta_bulk_s6[i] + '/'+ contenido_subdirectorio[j]
             df = pd.read_json(nombre_archivo_subdirectorio)
-            pprint(df.shape)
+            #pprint(df.shape)
             df = extraer_S6(df)
             convert_files_parquet_h5(df, salida_preprocesamiento_s6, contenido_subdirectorio[j], j)
+            ##convert_files_h5_parquet(df, salida_preprocesamiento_s6, contenido_subdirectorio[j], j)
             #pprint(contenido_subdirectorio[j])
             #df = pd.read_json(contenido_subdirectorio[j], lines=True)
             #print("Tamaño del dataframe: ", df.shape)
+
+pprint("Fin del preproceso de los archivos del S6")
