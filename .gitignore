@@ -171,4 +171,4 @@ s6_extracted_small/*
 *.parquet
 
 bulk-s6
-salidas_remake_s6_pandas
+salida_paso1_s6_pandas
