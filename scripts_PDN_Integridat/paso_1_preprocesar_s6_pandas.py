@@ -9,7 +9,7 @@ import gc
 from tqdm import tqdm
 tqdm.pandas()
 from itertools import islice
-import polars as pl
+#import polars as pl
 from pprint import pprint
 from time import sleep
 
@@ -52,7 +52,7 @@ def convert_files_parquet_h5(df, directorio_salida, nombre_archivo, i):
 
 ### Leer por carpeta o directorio y nombre de archivo o json
 ### Se iterqa sobre el directorio
-ruta_bulk_s6_todo = 'bulk-s6'
+ruta_bulk_s6_todo = '../bulk-s6'
 ruta_bulk_s6 = os.listdir(ruta_bulk_s6_todo)
 pprint(ruta_bulk_s6)
 #print(ruta_bulk_s6[0])
@@ -78,7 +78,7 @@ for i in range(len(ruta_bulk_s6)):
             #pprint(lista_directorio[j])
             #print(df.shape)
             nombre_archivo = lista_directorio[j].split(".")[0]
-            #print(nombre_archivo)
+            print(nombre_archivo)
             #convert_files_parquet(df, salida, nombre_archivo, x)
             x+=1
     if os.path.isfile('bulk-s6/'+ruta_bulk_s6[i]) == True:
@@ -86,7 +86,7 @@ for i in range(len(ruta_bulk_s6)):
         nombre_archivo = 'bulk-s6/' + ruta_bulk_s6[i]
         nombre_archivo.split(".")[0]
         #pprint(nombre_archivo)
-        df = pd.read_json(nombre_archivo)
+        ##df = pd.read_json(nombre_archivo)
         #pprint("nombre archivo desde raiz")
         #pprint(df.shape)
         #pprint(df.columns)
