@@ -1,29 +1,11 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import pandas as pd
 import numpy as np
-import os
-import glob
-import json
-import datetime
 from dateutil.parser import parse
-import gc
 from tqdm import tqdm
 tqdm.pandas()
-
-
-# In[2]:
-
-
-s6_df = pd.read_hdf("s6_hdf.h5")
-
-
-# In[3]:
-
+import os
+from pprint import pprint 
+import pyarrow as pa
 
 def parse_date(x):
     try:
@@ -63,44 +45,23 @@ def find_latest_date(dates):
         return None
         
 
+### Leer ztodos los archivos del S6 en formato parquet
 
-# In[4]:
+ruta_salida_paso1_s6_pandas = '../salida_paso1_s6_pandas/'
+contenido_salida_paso1_s6_pandas = os.listdir(ruta_salida_paso1_s6_pandas)
+#pprint(contenido_salida_paso1_s6_pandas)
+df_list = []
+salida_paso2_preprocesar_s6_pandas = '../salida_paso2_preprocesar_s6_pandas/'
 
+for archivo in contenido_salida_paso1_s6_pandas:
+    df = pd.read_parquet(ruta_salida_paso1_s6_pandas + archivo)
+    df["earliest_contractPeriod_startDate"] = df.contractPeriod_startDate.progress_apply(find_earliest_date)
+    df["latest_contractPeriod_endDate"] = df.contractPeriod_endDate.progress_apply(find_latest_date)
+    #pprint(df.head())
+    df_list.append(df)
 
-s6_df.head()
-
-
-# In[5]:
-
-
-s6_df["earliest_contractPeriod_startDate"] = s6_df.contractPeriod_startDate.progress_apply(find_earliest_date)
-s6_df["latest_contractPeriod_endDate"] = s6_df.contractPeriod_endDate.progress_apply(find_latest_date)
-
-
-# In[10]:
-
-
-s6_df = s6_df.drop(columns=["contractPeriod_startDate", "contractPeriod_endDate"])
-
-
-# In[14]:
-
-
-s6_df['earliest_contractPeriod_startDate'] = s6_df['earliest_contractPeriod_startDate'].progress_apply(lambda x: pd.to_datetime(x, utc=True))
-s6_df['latest_contractPeriod_endDate'] = s6_df['latest_contractPeriod_endDate'].progress_apply(lambda x: pd.to_datetime(x, utc=True))
-
-s6_df['earliest_contractPeriod_startDate'] = s6_df['earliest_contractPeriod_startDate'].dt.date
-s6_df['latest_contractPeriod_endDate'] = s6_df['latest_contractPeriod_endDate'].dt.date
-
-
-# In[15]:
-
-
-s6_df
-
-
-# In[16]:
-
-
-s6_df.to_hdf("s6_hdf_dates.h5", key = "s6_df")
-
+df_s6 = pd.concat(df_list)
+pprint(df_s6.head())
+pprint(df_s6.shape)
+pprint(df_s6.columns)
+df_s6.to_hdf(salida_paso2_preprocesar_s6_pandas + "s6_hdf_dates.h5", key = "s6_df")

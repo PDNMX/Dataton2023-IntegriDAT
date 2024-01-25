@@ -172,3 +172,6 @@ s6_extracted_small/*
 
 bulk-s6
 salida_paso1_s6_pandas
+salida_paso2_preprocesar_s6_pandas
+s3p
+s3s
