@@ -175,3 +175,9 @@ salida_paso1_s6_pandas
 salida_paso2_preprocesar_s6_pandas
 s3p
 s3s
+salida_paso1_preprocesar_s3_generar_periodods_invalidez
+salida_paso3_resultado_cruzar_s3_s6
+s1
+salida_paso_s1
+prueba_cruzar_s3_s6.ipynb
+cruce_s3_s6_inhabilitaciones.csv

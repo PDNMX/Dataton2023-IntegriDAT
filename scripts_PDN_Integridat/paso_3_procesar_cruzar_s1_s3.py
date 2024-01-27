@@ -11,8 +11,11 @@ from dateutil.parser import parse
 
 # In[90]:
 
+salida_paso1_preprocesar_s3 = "../salida_paso1_preprocesar_s3_generar_periodods_invalidez/"
 
-s3_inhab = pd.read_pickle("inhabilitaciones.pkl")
+#s3_inhab = pd.read_pickle(salida_paso1_preprocesar_s3 + "inhabilitaciones.pkl")
+
+s3_inhab = pd.read_pickle(salida_paso1_preprocesar_s3 + "inhabilitaciones.pkl")
 s1_posesion = pd.read_hdf("s1_fecha_toma_posesion.h5")
 
 
