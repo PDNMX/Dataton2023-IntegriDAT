@@ -41,6 +41,7 @@ def extraer_S6(df):
     df = df[keep_cols]
     res = df.awards.map(find_dates_no_processing)
     df["contractPeriod_startDate"], df["contractPeriod_endDate"] = zip(*res)
+    #df.loc[:, "contractPeriod_startDate"], df.loc[:, "contractPeriod_endDate"] = zip(*res)
     df = df.drop(columns=["awards"])
     df = df.explode("parties")
     res_contact = df.parties.map(extract_parties_names)
