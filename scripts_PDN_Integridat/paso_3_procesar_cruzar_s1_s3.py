@@ -1,129 +1,46 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[89]:
-
-
 import pandas as pd
-import numpy as np
+import json
 from dateutil.parser import parse
 
+def eliminar_duplicados(df):
+    # Eliminar duplicados basados en todas las columnas
+    df_sin_duplicados = df.drop_duplicates()
+    return df_sin_duplicados
 
-# In[90]:
+# Leer el archivo JSON con el nuevo formato de fecha
+with open("s1_fecha_toma_posesion.json", 'r') as f:
+    # Cargar el contenido del archivo JSON
+    datos_json_s1 = json.load(f)
 
-salida_paso1_preprocesar_s3 = "../salida_paso1_preprocesar_s3_generar_periodods_invalidez/"
+# Convertir el JSON en un DataFrame de pandas
+s1_posesion = pd.DataFrame(datos_json_s1)
 
-#s3_inhab = pd.read_pickle(salida_paso1_preprocesar_s3 + "inhabilitaciones.pkl")
+# Leer el archivo JSON con el nuevo formato de fecha
+with open("inhabilitaciones.json", 'r') as f:
+    # Cargar el contenido del archivo JSON
+    datos_json_inhab = json.load(f)
 
-s3_inhab = pd.read_pickle(salida_paso1_preprocesar_s3 + "inhabilitaciones.pkl")
-s1_posesion = pd.read_hdf("s1_fecha_toma_posesion.h5")
+# Convertir el JSON en un DataFrame de pandas
+inhabilitaciones = pd.DataFrame(datos_json_inhab)
 
+# Realizar la fusión de los dataframes
+df = s1_posesion.merge(inhabilitaciones, left_on="nombre_declaracion", right_on="sancion_nombre", how="inner", suffixes=("_s1", "_inhab"))
 
-# In[91]:
+# Convertir las columnas de fecha a tipo date
+df['fechaTomaPosesion'] = pd.to_datetime(df['fechaTomaPosesion'], errors='coerce').dt.date
+df['inhabilitacion_fechaInicial'] = pd.to_datetime(df['inhabilitacion_fechaInicial'], errors='coerce').dt.date
+df['inhabilitacion_fechaFinal'] = pd.to_datetime(df['inhabilitacion_fechaFinal'], errors='coerce').dt.date
 
+# Crear una columna que indica si la posesión ocurrió durante la inhabilitación
+df["posesion_durante_inhabilitacion"] = df['fechaTomaPosesion'].between(df['inhabilitacion_fechaInicial'], df['inhabilitacion_fechaFinal'])
 
-s1_posesion.head()
+# Eliminar duplicados
+df_sin_duplicados = eliminar_duplicados(df)
 
-
-# In[92]:
-
-
-s3_inhab.head()
-
-
-# In[93]:
-
-
-df = s1_posesion.merge(s3_inhab, left_on="nombre_declaracion", right_on="sancion_nombre", how = "inner", suffixes = ("s1", "s3") )
-
-
-# In[94]:
-
-
-df = df.drop_duplicates()
-
-
-# In[95]:
-
-
-df = df.dropna(subset=["nombre_declaracion","fechaTomaPosesion", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"])
-
-
-# In[96]:
-
-
-df['fechaTomaPosesion'] = df['fechaTomaPosesion'].apply(lambda x: pd.to_datetime(x, utc=True))
-df['inhabilitacion_fechaInicial'] = df['inhabilitacion_fechaInicial'].apply(lambda x: pd.to_datetime(x, utc=True))
-df['inhabilitacion_fechaFinal'] = df['inhabilitacion_fechaFinal'].apply(lambda x: pd.to_datetime(x, utc=True))
-
-df['fechaTomaPosesion'] = df['fechaTomaPosesion'].dt.date
-df['inhabilitacion_fechaInicial'] = df['inhabilitacion_fechaInicial'].dt.date
-df['inhabilitacion_fechaFinal'] = df['inhabilitacion_fechaFinal'].dt.date
-
-df["posesion_durante_inhabilitacion"] = df.fechaTomaPosesion.between(df.inhabilitacion_fechaInicial, df.inhabilitacion_fechaFinal)
-
-
-# In[97]:
-
-
-df[["nombre_declaracion","fechaTomaPosesion", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal", "posesion_durante_inhabilitacion"]]
-
-
-# In[98]:
-
-
-df.posesion_durante_inhabilitacion.sum()
-
-
-# In[99]:
-
-
-mask = df.posesion_durante_inhabilitacion
-df["posesion_durante_inhabilitacion"] = df["posesion_durante_inhabilitacion"].astype(int)
-
-
-# In[100]:
-
-
-resultado = df[mask]
-
-
-# In[101]:
-
-
-len(resultado.nombre_declaracion.unique())
-
-
-# In[102]:
-
-
-resultado = resultado.sort_values(by = "nombre_declaracion")
-resultado = resultado.reset_index(drop=True)
-resultado = resultado.drop(columns=["sancion_tipoPersona", "sancion_objetoSocial"])
-
-
-# In[103]:
-
-
-resultado.tipo_persona.value_counts()
-
-
-# In[104]:
-
-
+# Seleccionar columnas relevantes
 columnas_orden = ['nombre_declaracion', 'id', 'expediente', 'fechaTomaPosesion', 
        'inhabilitacion_fechaInicial', 'inhabilitacion_fechaFinal', 'posesion_durante_inhabilitacion']
-resultado = resultado[columnas_orden]
+df_final = df_sin_duplicados[columnas_orden]
 
-
-# In[105]:
-
-
-resultado
-
-
-# In[106]:
-
-
-resultado.to_excel("posesion_durante_inhabilitacion_IntegriDAT.xlsx", index=False)
-
+# Guardar el resultado en un archivo CSV
+df_final.to_csv("resultado_posesion_inhabilitacion.csv", index=False)

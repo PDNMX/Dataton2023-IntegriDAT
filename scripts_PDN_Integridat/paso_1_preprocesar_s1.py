@@ -1,67 +1,62 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-
-
-
-# In[ ]:
-
-
-import pandas as pd
-import numpy as np
 import os
-import glob
 import json
-import datetime
-from dateutil.parser import parse
-import gc
+from dateutil.parser import parse, ParserError
 
+# Carpeta base
+carpeta_base = "datos-pdn/s1/"
 
-# In[2]:
+# Abrir el archivo de salida en modo de agregar
+with open("s1_fecha_toma_posesion.json", 'a') as f_out:
+    # Agregar el corchete de apertura al inicio del archivo
+    f_out.write("[\n")
 
+    # Recorrer carpetas y archivos dentro de la carpeta base
+    for directorio_actual, subdirectorios, archivos in os.walk(carpeta_base):
+        for archivo_json in archivos:
+            # Combinar la ruta del directorio actual con el nombre del archivo
+            ruta_completa = os.path.join(directorio_actual, archivo_json)
 
-all_files_s1 = glob.glob(os.path.join("s1" , "*/*.json"))
-s1_df_from_each_file = (pd.read_json(f) for f in all_files_s1)
-s1_df = pd.concat(s1_df_from_each_file, ignore_index=True)
-s1_df.to_pickle("s1_df_raw.pkl")
-s1_df = pd.read_pickle("s1_df_raw.pkl")
+            print(f"Procesando archivo: {ruta_completa}")
 
+            with open(ruta_completa, 'r') as f:
+                try:
+                    # Cargar el archivo JSON como un diccionario
+                    datos_json = json.load(f)
 
-# In[8]:
+                    # Obtener el objeto "declaracion"
+                    declaraciones = datos_json
 
+                    # Procesar cada declaración
+                    for declaracion in declaraciones:
+                        nombre = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosGenerales", {}).get("nombre", "")
+                        primer_apellido = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosGenerales", {}).get("primerApellido", "")
+                        segundo_apellido = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosGenerales", {}).get("segundoApellido", "")
 
-s1_df = s1_df[["declaracion"]]
+                        # Concatenar nombres y apellidos
+                        nombre_declaracion = f"{nombre} {primer_apellido} {segundo_apellido}".lower().strip()
+                        nombre_declaracion = nombre_declaracion.encode('ascii', 'ignore').decode('utf-8')
 
+                        # Parsear fecha de toma de posesión
+                        fecha_toma_posesion_str = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosEmpleoCargoComision", {}).get("fechaTomaPosesion", "")
+                        try:
+                            fecha_toma_posesion = parse(fecha_toma_posesion_str).strftime('%Y-%m-%d') if fecha_toma_posesion_str else None
+                        except ParserError as e:
+                            print(f"Error al parsear fecha en archivo {ruta_completa}: {e}")
+                            fecha_toma_posesion = None
+                        # Almacenar resultados
+                        resultado = {
+                            "nombre_declaracion": nombre_declaracion,
+                            "fechaTomaPosesion": fecha_toma_posesion
+                        }
 
-# In[9]:
+                        # Escribir el resultado al archivo de salida
+                        json.dump(resultado, f_out, default=str)
+                        f_out.write(',\n')  # Agregar una coma y un salto de línea para separar los resultados
 
+                except json.JSONDecodeError as e:
+                    print(f"Error al decodificar JSON en archivo {ruta_completa}: {e}")
 
-declaracion = pd.json_normalize(s1_df.declaracion)
-
-
-# In[11]:
-
-
-del s1_df
-
-
-# In[12]:
-
-
-gc.collect()
-
-
-# In[13]:
-
-
-declaracion.to_pickle("s1_declaracion.pkl")
-
-
-# In[10]:
-
-
-declaracion
-
+    # Retroceder para sobrescribir la última coma y agregar el corchete de cierre al final del archivo
+    f_out.seek(f_out.tell() - 2, os.SEEK_SET)
+    f_out.truncate()
+    f_out.write("\n]\n")

@@ -5,63 +5,96 @@ import glob
 import json
 import datetime
 from dateutil.parser import parse
+from concurrent.futures import ThreadPoolExecutor
 
 def parse_date(x):
     try:
         return parse(x)
     except:
         return np.datetime64('NaT')
-    
-all_files_s3p = glob.glob(os.path.join("../s3p" , "*/*.json"))
-s3p_df_from_each_file = (pd.read_json(f) for f in all_files_s3p)
-s3p_df = pd.concat(s3p_df_from_each_file, ignore_index=True)
 
-all_files_s3s = glob.glob(os.path.join("../s3s" , "*/*.json"))
-s3s_df_from_each_file = (pd.read_json(f) for f in all_files_s3s)
-s3s_df = pd.concat(s3s_df_from_each_file, ignore_index=True)
+def process_s3p_file(file_path):
+    try:
+        print(f"Leyendo archivo s3p: {file_path}")
+        df = pd.read_json(file_path)
+        sancionados = pd.json_normalize(df.particularSancionado)
+        inhabilitacion = pd.json_normalize(df.inhabilitacion)
+        inhabilitacion.fechaInicial = inhabilitacion.fechaInicial.apply(parse_date)
+        inhabilitacion.fechaFinal = inhabilitacion.fechaFinal.apply(parse_date)
 
-sancionados = pd.json_normalize(s3p_df.particularSancionado)
-inhabilitacion = pd.json_normalize(s3p_df.inhabilitacion)
-inhabilitacion.fechaInicial =   inhabilitacion.fechaInicial.apply(parse_date)
-inhabilitacion.fechaFinal = inhabilitacion.fechaFinal.apply(parse_date)
+        df["sancion_nombre"] = sancionados.nombreRazonSocial
+        df["sancion_tipoPersona"] = sancionados.tipoPersona
+        df["sancion_objetoSocial"] = sancionados.objetoSocial
+        df["inhabilitacion_fechaInicial"] = inhabilitacion.fechaInicial.dt.strftime('%Y-%m-%d')
+        df["inhabilitacion_fechaFinal"] = inhabilitacion.fechaFinal.dt.strftime('%Y-%m-%d')
+        df["sancion_nombre"] = df["sancion_nombre"].str.lower()
+        df["sancion_nombre"] = df["sancion_nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
 
-s3p_df["sancion_nombre"] = sancionados.nombreRazonSocial
-s3p_df["sancion_tipoPersona"] = sancionados.tipoPersona
-s3p_df["sancion_objetoSocial"] = sancionados.objetoSocial
-s3p_df["inhabilitacion_fechaInicial"] = inhabilitacion.fechaInicial
-s3p_df["inhabilitacion_fechaFinal"] = inhabilitacion.fechaFinal
-s3p_df["sancion_nombre"] = s3p_df["sancion_nombre"].str.lower()
-s3p_df["sancion_nombre"] = s3p_df["sancion_nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+        columnas = ["id", "expediente", "sancion_nombre", "sancion_tipoPersona", "sancion_objetoSocial", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
+        df = df[columnas]
+        df["tipo_persona"] = "particular"
 
-columnas = ["id", "expediente", "sancion_nombre", "sancion_tipoPersona", "sancion_objetoSocial", "inhabilitacion_fechaInicial","inhabilitacion_fechaFinal"]
-s3p_df = s3p_df[columnas]
-s3p_df["tipo_persona"] = "particular"
-#s3p_df[6:10]
+        return df
+    except Exception as e:
+        print(f"Error al procesar {file_path}: {e}")
+        return pd.DataFrame()
 
-servidorPublicoSancionado = pd.json_normalize(s3s_df.servidorPublicoSancionado)
-inhabilitacion_servidor = pd.json_normalize(s3s_df.inhabilitacion)
+def process_s3s_file(file_path):
+    try:
+        print(f"Leyendo archivo s3s: {file_path}")
+        df = pd.read_json(file_path)
+        servidorPublicoSancionado = pd.json_normalize(df.servidorPublicoSancionado)
+        inhabilitacion_servidor = pd.json_normalize(df.inhabilitacion)
 
-servidorPublicoSancionado[["nombres", "primerApellido", "segundoApellido" ]] = servidorPublicoSancionado[["nombres", "primerApellido", "segundoApellido" ]].fillna("")
-servidorPublicoSancionado["nombre"] = servidorPublicoSancionado.nombres + " " + servidorPublicoSancionado.primerApellido + " " + servidorPublicoSancionado.segundoApellido
-servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.lower().str.strip()
-servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+        servidorPublicoSancionado[["nombres", "primerApellido", "segundoApellido" ]] = servidorPublicoSancionado[["nombres", "primerApellido", "segundoApellido" ]].fillna("")
+        servidorPublicoSancionado["nombre"] = servidorPublicoSancionado.nombres + " " + servidorPublicoSancionado.primerApellido + " " + servidorPublicoSancionado.segundoApellido
+        servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.lower().str.strip()
+        servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
 
-inhabilitacion_servidor.fechaInicial =  inhabilitacion_servidor.fechaInicial.apply(parse_date)
-inhabilitacion_servidor.fechaFinal = inhabilitacion_servidor.fechaFinal.apply(parse_date)
+        inhabilitacion_servidor.fechaInicial =  inhabilitacion_servidor.fechaInicial.apply(parse_date)
+        inhabilitacion_servidor.fechaFinal = inhabilitacion_servidor.fechaFinal.apply(parse_date)
 
-mask = (~inhabilitacion_servidor.fechaInicial.isna()) & (inhabilitacion_servidor.fechaFinal.isna())  
-#inhabilitacion_servidor[mask]
+        mask = (~inhabilitacion_servidor.fechaInicial.isna()) & (inhabilitacion_servidor.fechaFinal.isna())  
 
-s3s_df["sancion_nombre"] = servidorPublicoSancionado["nombre"]
-s3s_df["inhabilitacion_fechaInicial"] = inhabilitacion_servidor.fechaInicial
-s3s_df["inhabilitacion_fechaFinal"] = inhabilitacion_servidor.fechaFinal
+        df["sancion_nombre"] = servidorPublicoSancionado["nombre"]
+        df["inhabilitacion_fechaInicial"] = inhabilitacion_servidor.fechaInicial.dt.strftime('%Y-%m-%d')
+        df["inhabilitacion_fechaFinal"] = inhabilitacion_servidor.fechaFinal.dt.strftime('%Y-%m-%d')
 
-columnas = ["id", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
-#s3s_df = s3s_df[columnas]
-s3s_df["tipo_persona"] = "servidor_publico"
-#s3s_df.head()
+        columnas = ["id", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
+        df = df[columnas]
+        df["tipo_persona"] = "servidor_publico"
 
-df = pd.concat([s3p_df,s3s_df]).reset_index(drop = True)
+        return df
+    except Exception as e:
+        print(f"Error al procesar {file_path}: {e}")
+        return pd.DataFrame()
 
-salida_paso1_s3 = "../salida_paso1_preprocesar_s3_generar_periodods_invalidez/"
-df.to_pickle(salida_paso1_s3 + "inhabilitaciones.pkl")
+# Obtener la lista de carpetas en "datos-pdn/s3p/" y "datos-pdn/s3s/"
+all_folders_s3p = [f.path for f in os.scandir("datos-pdn/s3p/") if f.is_dir()]
+all_folders_s3s = [f.path for f in os.scandir("datos-pdn/s3s/") if f.is_dir()]
+
+# Inicializar listas para almacenar los DataFrames de cada carpeta
+s3p_dfs = []
+s3s_dfs = []
+
+# Utilizar ThreadPoolExecutor para procesar las carpetas en paralelo
+with ThreadPoolExecutor() as executor:
+    # Procesar archivos s3p
+    for folder_path in all_folders_s3p:
+        all_files_s3p = glob.glob(os.path.join(folder_path, "*.json"))
+        s3p_dfs.extend(list(executor.map(process_s3p_file, all_files_s3p)))
+
+    # Procesar archivos s3s
+    for folder_path in all_folders_s3s:
+        all_files_s3s = glob.glob(os.path.join(folder_path, "*.json"))
+        s3s_dfs.extend(list(executor.map(process_s3s_file, all_files_s3s)))
+
+# Concatenar todos los DataFrames de s3p y s3s
+s3p_df = pd.concat(s3p_dfs, ignore_index=True)
+s3s_df = pd.concat(s3s_dfs, ignore_index=True)
+
+# Combinar ambos DataFrames
+combined_df = pd.concat([s3p_df, s3s_df], ignore_index=True)
+
+# Guardar el DataFrame combinado en un archivo JSON
+combined_df.to_json("inhabilitaciones.json", orient="records")
