@@ -22,20 +22,20 @@ def process_s3p_file(file_path):
         inhabilitacion.fechaInicial = inhabilitacion.fechaInicial.apply(parse_date)
         inhabilitacion.fechaFinal = inhabilitacion.fechaFinal.apply(parse_date)
 
+        #df["tipoFalta"] = pd.json_normalize(df.tipoFalta)
+        """ tipoSancion = pd.json_normalize(df.tipoSancion)
+        df["tipoSancion"] = tipoSancion.valor """
+
+        #print (pd.json_normalize(df.tipoFalta))
+        #print (tipoSancion.valor)
+
         df["sancion_nombre"] = sancionados.nombreRazonSocial
-        df["sancion_tipoPersona"] = sancionados.tipoPersona
-        df["sancion_objetoSocial"] = sancionados.objetoSocial
         df["inhabilitacion_fechaInicial"] = inhabilitacion.fechaInicial.dt.strftime('%Y-%m-%d')
         df["inhabilitacion_fechaFinal"] = inhabilitacion.fechaFinal.dt.strftime('%Y-%m-%d')
         df["sancion_nombre"] = df["sancion_nombre"].str.lower()
         df["sancion_nombre"] = df["sancion_nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
-        df["tipoFalta"] = df["tipoFalta"].str.lower()
-        df['causaMotivoHechos'] = df['causaMotivoHechos'].str.lower()
-        df['tipoSancion'] = df['tipoSancion'].str.lower()
-        #s3p['objetoContrato'].get(0)
-        df['objetoContrato'] = sancionados.objetoContrato.get(0)
 
-        columnas = ["id", "expediente", "sancion_nombre", "sancion_tipoPersona", "sancion_objetoSocial", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal","tipoSancion", "causaMotivoHechos", "tipoSancion", "objetoContrato" ]
+        columnas = ["tipoFalta", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
         df = df[columnas]
         df["tipo_persona"] = "particular"
 
@@ -51,6 +51,12 @@ def process_s3s_file(file_path):
         servidorPublicoSancionado = pd.json_normalize(df.servidorPublicoSancionado)
         inhabilitacion_servidor = pd.json_normalize(df.inhabilitacion)
 
+        """ tipoSancion = pd.json_normalize(df.tipoSancion)
+        df["tipoSancion"] = tipoSancion.valor """
+
+        tipoFalta = pd.json_normalize(df.tipoFalta)
+        df["tipoFalta"] = tipoFalta.valor
+
         servidorPublicoSancionado[["nombres", "primerApellido", "segundoApellido" ]] = servidorPublicoSancionado[["nombres", "primerApellido", "segundoApellido" ]].fillna("")
         servidorPublicoSancionado["nombre"] = servidorPublicoSancionado.nombres + " " + servidorPublicoSancionado.primerApellido + " " + servidorPublicoSancionado.segundoApellido
         servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.lower().str.strip()
@@ -64,9 +70,8 @@ def process_s3s_file(file_path):
         df["sancion_nombre"] = servidorPublicoSancionado["nombre"]
         df["inhabilitacion_fechaInicial"] = inhabilitacion_servidor.fechaInicial.dt.strftime('%Y-%m-%d')
         df["inhabilitacion_fechaFinal"] = inhabilitacion_servidor.fechaFinal.dt.strftime('%Y-%m-%d')
-        df["tipoFalta"] = inhabilitacion_servidor.tipoFalta
-        df["tipoSancion"] = inhabilitacion_servidor.tipoSancion
-        columnas = ["id", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
+
+        columnas = ["tipoFalta", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
         df = df[columnas]
         df["tipo_persona"] = "servidor_publico"
 
