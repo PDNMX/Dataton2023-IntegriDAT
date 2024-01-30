@@ -36,8 +36,9 @@ s6_df["parties_contactPoint_name"] = s6_df["parties_contactPoint_name"].str.norm
 df1 = s3_inhab.merge(s6_df, left_on="sancion_nombre", right_on="parties_name", how = "inner", suffixes = ("s3", "s6") )
 df2 = s3_inhab.merge(s6_df, left_on="sancion_nombre", right_on="parties_contactPoint_name", how = "inner", suffixes = ("s3", "s6") )
 df = pd.concat([df1, df2])
-#df = df.apply(lambda x: str(x))
-df = df.drop_duplicates(["sancion_nombre","parties_name", "parties_contactPoint_name"],keep="last")
+#df = df.progress_apply(lambda x: str(x))
+#df = df.drop_duplicates(["sancion_nombre","parties_name", "parties_contactPoint_name"],keep="last")
+df = df.drop_duplicates(["sancion_nombre"],keep="last")
 #df = df.dropna(subset=["inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal", "earliest_contractPeriod_startDate", "latest_contractPeriod_endDate"])
 
 df.earliest_contractPeriod_startDate = pd.to_datetime(df.earliest_contractPeriod_startDate, utc=True)

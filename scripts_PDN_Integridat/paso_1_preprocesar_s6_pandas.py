@@ -36,8 +36,21 @@ def extract_parties_names(parties):
     else:
         return "", ""
 
+def get_address_string(address):
+    if address is not None:
+        return ",".join([
+            address.get("countryName", ""),
+            address.get("locality", ""),
+            address.get("postalCode", ""),
+            address.get("region", ""),
+            address.get("streetAddress", "")
+        ])
+    else:
+        return ""
+
+
 def extraer_S6(df):
-    keep_cols = ['_id', "ocid", "id", "parties", "awards"]
+    keep_cols = ['_id', "ocid", "id", "parties", "awards" ]
     df = df[keep_cols]
     res = df.awards.map(find_dates_no_processing)
     df["contractPeriod_startDate"], df["contractPeriod_endDate"] = zip(*res)
@@ -46,9 +59,14 @@ def extraer_S6(df):
     df = df.explode("parties")
     res_contact = df.parties.map(extract_parties_names)
     df["parties_name"], df["parties_contactPoint_name"] = zip(*res_contact)
+    df["entidadFederativa"] = df.parties.map(lambda x: x.get("address", {}).get("region"))
+    df["parties_address"] = df.parties.map(get_address_string)
+    df["parties_roles"] = df.parties.map(lambda x: x.get("roles", []))
     df = df.drop(columns=["parties"])
     df = df.reset_index(drop = True)
     return df
+
+
 
 def convert_files_parquet_h5(df, directorio_salida, nombre_archivo, i):
     try:
@@ -109,5 +127,5 @@ for i in range(len(contenido_ruta_bulk_s6)):
             #pprint(contenido_subdirectorio[j])
             #df = pd.read_json(contenido_subdirectorio[j], lines=True)
             #print("Tamaño del dataframe: ", df.shape)
-
+print("Obtencion de las nuevas columnas del S6")
 pprint("Fin del preproceso de los archivos del S6")
