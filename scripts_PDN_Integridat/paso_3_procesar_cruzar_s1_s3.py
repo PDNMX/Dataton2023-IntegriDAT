@@ -38,7 +38,7 @@ df["posesion_durante_inhabilitacion"] = df['fechaTomaPosesion'].between(df['inha
 df_sin_duplicados = eliminar_duplicados(df)
 
 # Seleccionar columnas relevantes
-columnas_orden = ['nombre_declaracion', 'id', 'expediente', 'fechaTomaPosesion', 
+columnas_orden = ['nombre_declaracion', 'tipoFalta', 'tipo_persona', 'nivelOrdenGobierno', 'nombreEntePublico', 'empleoCargoComision', 'claveEntidadFederativa', 'expediente', 'fechaTomaPosesion', 
        'inhabilitacion_fechaInicial', 'inhabilitacion_fechaFinal', 'posesion_durante_inhabilitacion']
 df_final = df_sin_duplicados[columnas_orden]
 

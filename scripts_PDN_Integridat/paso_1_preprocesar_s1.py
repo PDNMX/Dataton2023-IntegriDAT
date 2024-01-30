@@ -32,6 +32,10 @@ with open("s1_fecha_toma_posesion.json", 'a') as f_out:
                         primer_apellido = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosGenerales", {}).get("primerApellido", "")
                         segundo_apellido = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosGenerales", {}).get("segundoApellido", "")
 
+                        nivelOrdenGobierno = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosEmpleoCargoComision", {}).get("nivelOrdenGobierno", "")
+                        nombreEntePublico = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosEmpleoCargoComision", {}).get("nombreEntePublico", "")
+                        empleoCargoComision = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosEmpleoCargoComision", {}).get("empleoCargoComision", "")
+                        claveEntidadFederativa = declaracion.get("declaracion", {}).get("situacionPatrimonial", {}).get("datosEmpleoCargoComision", {}).get("domicilioMexico", {}).get("entidadFederativa", {}).get("clave", "")
                         # Concatenar nombres y apellidos
                         nombre_declaracion = f"{nombre} {primer_apellido} {segundo_apellido}".lower().strip()
                         nombre_declaracion = nombre_declaracion.encode('ascii', 'ignore').decode('utf-8')
@@ -46,7 +50,11 @@ with open("s1_fecha_toma_posesion.json", 'a') as f_out:
                         # Almacenar resultados
                         resultado = {
                             "nombre_declaracion": nombre_declaracion,
-                            "fechaTomaPosesion": fecha_toma_posesion
+                            "fechaTomaPosesion": fecha_toma_posesion,
+                            "nivelOrdenGobierno": nivelOrdenGobierno,
+                            "nombreEntePublico": nombreEntePublico,
+                            "empleoCargoComision": empleoCargoComision,
+                            "claveEntidadFederativa": claveEntidadFederativa
                         }
 
                         # Escribir el resultado al archivo de salida
