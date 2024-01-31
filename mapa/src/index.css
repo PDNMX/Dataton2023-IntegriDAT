@@ -1,0 +1,19 @@
+#map {
+    margin: 0 auto;
+    display: block;
+    padding: 0.5rem 0;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    min-width: 60px;
+    /* height: 30px; */
+    padding: 0.4rem;
+    font: 12px sans-serif;
+    background: rgb(54, 54, 54);
+    color: rgb(255, 255, 255);
+    border: 0px;
+    border-radius: 3px;
+    pointer-events: none;
+}

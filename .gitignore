@@ -186,4 +186,4 @@ prueba_columnas_datos.ipynb
 virtual-env/
 scripts_PDN_Integridat/datos-pdn
 
-*.json
+node_modules/
