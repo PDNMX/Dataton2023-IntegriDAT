@@ -15,7 +15,7 @@ def parse_date(x):
 
 def process_s3p_file(file_path):
     try:
-        print(f"Leyendo archivo s3p: {file_path}")
+        print(f"Procesando archivo s3p: {file_path}")
         df = pd.read_json(file_path)
         sancionados = pd.json_normalize(df.particularSancionado)
         inhabilitacion = pd.json_normalize(df.inhabilitacion)
@@ -46,7 +46,7 @@ def process_s3p_file(file_path):
 
 def process_s3s_file(file_path):
     try:
-        print(f"Leyendo archivo s3s: {file_path}")
+        print(f"Procesando archivo s3s: {file_path}")
         df = pd.read_json(file_path)
         servidorPublicoSancionado = pd.json_normalize(df.servidorPublicoSancionado)
         inhabilitacion_servidor = pd.json_normalize(df.inhabilitacion)
