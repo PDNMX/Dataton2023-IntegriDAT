@@ -8,7 +8,6 @@
     position: absolute;
     text-align: center;
     min-width: 60px;
-    /* height: 30px; */
     padding: 0.4rem;
     font: 12px sans-serif;
     background: rgb(54, 54, 54);
@@ -17,3 +16,36 @@
     border-radius: 3px;
     pointer-events: none;
 }
+
+/* Estilos para el header */
+.navbar-brand svg {
+    height: 30px;
+    width: auto;
+    margin-right: 5px;
+}
+
+/* Estilos para el cuerpo de la página */
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.container {
+    margin-top: 30px;
+}
+
+/* Estilos para la leyenda */
+#leyenda {
+    background-color: white; /* Fondo blanco */
+    border: 1px solid #ddd; /* Borde gris */
+    padding: 10px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+#leyenda svg {
+    color: black;
+    /* Estilos adicionales para el contenido de la leyenda */
+    /* Puedes ajustar estos estilos según tus preferencias */
+}
+
+
