@@ -2,17 +2,19 @@
 let currentMap;
 let colorDomain; // Declarar la variable a nivel global
 let currentModal; // Declarar la variable a nivel global para la modal actual
+const highlightedKeys = ["02","03","04","09","05","06","10","11","12","13","17","18","19","20","22","24","25","26","27","28","30"];
+const highlightColor = "#5b635b"; 
 
 const colorDomains = {
-  "s1-vs-s3.json": [5, 10, 15],
-  "s6-vs-s3.json": [1, 2, 3] // Agrega el dominio para el otro archivo
+  "s1-vs-s3.json": [0, 1, 5, 10, 15, 20],
+  "s6-vs-s3_original.json": [0, 1, 2, 6, 11, 16] // Ajusta el dominio para el otro archivo
 };
 
-// Define los rangos de colores para cada mapa
 const colorRanges = {
-  "s1-vs-s3.json": ["#fae9a8", "#ffba00", "#ff7d73", "#ff1300"],
-  "s6-vs-s3.json": ["#cfe8f3", "#5aa3d0", "#206489"]
+  "s1-vs-s3.json": ["#808080", "#ffc0cb", "#ffff00", "#ffa500", "#ff0000"],
+  "s6-vs-s3_original.json": ["#cfe8f3", "#ffc0cb", "#ffff00", "#ffa500", "#ff0000"] // Corregido aquí
 };
+
 
 function drawLegend(colorScale, colorDomain) {
   const legendContainer = d3.select("#leyenda");
@@ -110,23 +112,63 @@ function draw(mapDataFile) {
             element.properties.dataInhabilitados = dataInhabilitados;
           }
         });
+    
+        // Filtra las claves que tienen un valor en totalContratacion
+        /* if (element.properties.totalContratacion !== undefined) {
+          const index = highlightedKeys.indexOf(element.properties.clave);
+          if (index !== -1) {
+            highlightedKeys.splice(index, 1);
+          }
+        } */
       });
 
       const geojson = topojson.feature(mexico, mexico.objects.collection);
+      const color = d3.scaleThreshold().domain(colorDomain).range(colorRange);
+    
+    /*
+      const geojson = topojson.feature(mexico, mexico.objects.collection);
+      const color = d3.scaleThreshold().domain(colorDomain).range(colorRange);
 
+      map
+      .selectAll("path")
+      .data(geojson.features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+      .style("stroke", "black")
+      .style("fill", (d) => {
+        const { totalContratacion } = d.properties;
+    
+        // Si el valor es undefined, devuelve el color gris
+        if (totalContratacion === undefined) {
+          return "white"; // o cualquier otro color gris que desees
+        }
+    
+        return color(totalContratacion);
+      }) */
       map
         .selectAll("path")
         .data(geojson.features)
         .enter()
         .append("path")
         .attr("d", path)
-        .style("stroke", "gray")
+        .style("stroke", "black")
         .style("fill", (d) => {
-          const { totalContratacion } = d.properties;
-          if (totalContratacion == undefined) {
-            return "#adfcad";
+          const { totalContratacion, clave } = d.properties;
+
+          // Verifica si totalContratacion tiene un valor
+          if (totalContratacion !== undefined && totalContratacion !== 0) {
+            // Utiliza la escala de colores existente para totalContratacion
+            return color(totalContratacion);
           }
-          return color(totalContratacion);
+
+          // Verifica si la clave de entidad está en la lista de claves que deseas resaltar
+          if (highlightedKeys.includes(clave)) {
+            return highlightColor;
+          }
+
+          // Si totalContratacion no tiene un valor y la entidad no está en highlightedKeys, devuelve color gris
+          return "white"; // o cualquier otro color gris que desees
         })
         .on('click', (_, d) => {
           const { dataInhabilitados } = d.properties;
@@ -200,12 +242,12 @@ function changeMap(newMapDataFile) {
   // Asigna la modal actual según el mapa seleccionado
   if (newMapDataFile === 's1-vs-s3.json') {
     currentModal = new bootstrap.Modal(document.getElementById('mapaModal'));
-  } else if (newMapDataFile === 's6-vs-s3.json') {
-    currentModal = new bootstrap.Modal(document.getElementById('otraModal'));
+  } else if (newMapDataFile === 's6-vs-s3_original.json') {
+    currentModal = new bootstrap.Modal(document.getElementById('mapaModal2'));
   }
 
   // Muestra la nueva modal después de asignarla
-  currentModal.show();
+  //currentModal.show();
   drawLegend(color, colorDomain);
 }
 

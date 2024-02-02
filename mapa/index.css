@@ -47,5 +47,26 @@ body {
     /* Estilos adicionales para el contenido de la leyenda */
     /* Puedes ajustar estos estilos según tus preferencias */
 }
+/* .footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+} */
+/* Estilo del Header */
+.navbar {
+    background: linear-gradient(to right, #3498db, #9b59b6); /* Cambia los colores según tus preferencias */
+}
+
+/* Estilo del Footer */
+.footer {
+    background: linear-gradient(to right, #3498db, #9b59b6); /* Mismos colores que el header */
+}
+
+/* Otros estilos del Footer (puedes ajustarlos según tus necesidades) */
+.footer {
+    padding: 20px;
+    text-align: center;
+    color: #fff; /* Texto en color blanco para mayor contraste */
+}
 
 
