@@ -60,7 +60,8 @@ df_result[["inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal", "earliest
 
 columnas_orden = ["sancion_nombre",'tipo_persona', 'sancion_tipoPersona', 'sancion_objetoSocial', 'inhabilitacion_fechaInicial',
                   'inhabilitacion_fechaFinal','earliest_contractPeriod_startDate', 'latest_contractPeriod_endDate', 'parties_name', "parties_contactPoint_name",
-                  'ids3', 'expediente', '_id', 'ocid', 'ids6', 'contrato_durante_inhabilitacion']
+                  'ids3', 'expediente', '_id', 'ocid', 'ids6', 'contrato_durante_inhabilitacion',
+                  "procuring_entity", "procuring_entity_region", "procuring_entity_country", "procuring_entity_locality", "procuring_entity_streetAddress"]
 
 """
 columnas_orden = ["sancion_nombre",'tipo_persona', 'sancion_tipoPersona', 'sancion_objetoSocial', 'inhabilitacion_fechaInicial',
@@ -76,5 +77,6 @@ df_result = df_result.reset_index(drop = True)
 df_result = df_result.astype(str)
 salida_paso3_resultado_cruzar_s3_s6 = "../salida_paso3_resultado_cruzar_s3_s6/"
 df_result.to_excel(salida_paso3_resultado_cruzar_s3_s6 + "contrato_durante_inhabilitacion_IntegriDAT.xlsx", index=False)
+df_result.to_json(salida_paso3_resultado_cruzar_s3_s6 + "contrato_durante_inhabilitacion_IntegriDAT.json", orient="records")
 print("Se ha terminado de cruzar la informacion del s3 y el s6")
 print("El archivo de salida esta en la ruta" + str(salida_paso3_resultado_cruzar_s3_s6))

@@ -48,9 +48,17 @@ def get_address_string(address):
     else:
         return ""
 
+def datos_procuriEntity(df):
+    df['procuring_entity'] = df['parties'].apply(lambda x: [party['name'] for party in x if 'procuringEntity' in party.get('roles', [])][0] if any('procuringEntity' in party.get('roles', []) for party in x) else None)
+    df['procuring_entity_region'] = df['parties'].apply(lambda x: [party['address'].get("region") for party in x if 'procuringEntity' in party.get('roles', [])][0] if any('procuringEntity' in party.get('roles', []) for party in x) else None)
+    df['procuring_entity_country'] = df['parties'].apply(lambda x: [party['address'].get("country") for party in x if 'procuringEntity' in party.get('roles', [])][0] if any('procuringEntity' in party.get('roles', []) for party in x) else None)
+    df['procuring_entity_locality'] = df['parties'].apply(lambda x: [party['address'].get("locality") for party in x if 'procuringEntity' in party.get('roles', [])][0] if any('procuringEntity' in party.get('roles', []) for party in x) else None)
+    df['procuring_entity_streetAddress'] = df['parties'].apply(lambda x: [party['address'].get("streetAddress") for party in x if 'procuringEntity' in party.get('roles', [])][0] if any('procuringEntity' in party.get('roles', []) for party in x) else None)
+    return df
 
 def extraer_S6(df):
-    keep_cols = ['_id', "ocid", "id", "parties", "awards" ]
+    df = datos_procuriEntity(df)
+    keep_cols = ['_id', "ocid", "id", "parties", "awards", "procuring_entity", "procuring_entity_region", "procuring_entity_country", "procuring_entity_locality", "procuring_entity_streetAddress"]
     df = df[keep_cols]
     res = df.awards.map(find_dates_no_processing)
     df["contractPeriod_startDate"], df["contractPeriod_endDate"] = zip(*res)
