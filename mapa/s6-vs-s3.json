@@ -1,6 +1,6 @@
 [
   {
-    "nombre_declaracion": "gabriel lopez hernandez",
+    "nombre_declaracion": "otro dato",
     "tipoFalta": "ADMINISTRATIVA GRAVE",
     "tipo_persona": "servidor_publico",
     "nivelOrdenGobierno": "MUNICIPAL_ALCALDIA",
@@ -28,7 +28,7 @@
     "posesion_durante_inhabilitacion": true
   },
   {
-    "nombre_declaracion": "jose luis garcia lopez",
+    "nombre_declaracion": "otro 123",
     "tipoFalta": "OTRO",
     "tipo_persona": "servidor_publico",
     "nivelOrdenGobierno": "MUNICIPAL_ALCALDIA",
@@ -1050,7 +1050,7 @@
     "posesion_durante_inhabilitacion": true
   },
   {
-    "nombre_declaracion": "roberto estrada cota",
+    "nombre_declaracion": "un dato de prueba",
     "tipoFalta": "Dato no proporcionado",
     "tipo_persona": "servidor_publico",
     "nivelOrdenGobierno": "ESTATAL",

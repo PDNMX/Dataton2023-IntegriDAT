@@ -10,42 +10,16 @@
 
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <!-- Logotipo -->
-            <div><a class="navbar-brand" href="#">
-                <img src="/iconos/logo_pdn-transparente.svg" alt="PDN" />
-                <!-- Puedes reemplazar la etiqueta img por tu logo SVG -->
-            </a></div>
-            
-            <div><h1>Identificador de contrataciones indebidas</h1></div>
-
-            <!-- Título del menú -->
-           <!--  <h1 class="navbar-brand">Mi Sitio Web</h1> -->
-
-            <!-- Botón para colapsar en dispositivos pequeños -->
-           <!--  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button> -->
-
-            <!-- Enlaces del menú -->
-            <!-- <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Acerca de</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contacto</a>
-                    </li>
-                </ul>
-            </div> -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"
+  style="background: transparent linear-gradient(230deg, #1C7CBF 0%, #1C7CBF 4%, #9F58E2 49%, #6D4061 100%) 0% 0% !important; z-index: 10;" id="navSistemas" >
+        <div id="encabezado"  class="d-flex flex-row" >
+            <div><img id="logoHeader" alt="PDN" src="/iconos/logo_pdn-transparente.svg" ></div>
+                <div class="align-middle">
+                <p class="navbar-text" id="letrasSistemas" style="color: white !important; padding-left: 10px; font-size: 1.875rem;" > Identificador de contrataciones indebidas</p>
+                </div>     
         </div>
-     </nav>
-    
+    </nav>
+    <br><br><br><br><br><br>
     <!--<div class="container mt-5">
         <div class="row">
             <div class="col-12">
@@ -75,11 +49,11 @@
             <div class="col-12 mt-5">
                 <h2>Persona servidora pública inhabilitada para ocupar un empleo, cargo o comisión en el servicio
                     público o inhabilitado para realizar contrataciones con los entes públicos</h2>
-                    <!-- Dibuja el mapa -->                
-                    <div id="vis" class="title"></div>
-                    <!-- Sección de Leyenda -->
-                    <div id="leyenda" class="leyenda-container">
-                        <!-- Puedes agregar elementos específicos para la leyenda aquí -->
+                    <div class="contenedor_Mapa" id="contenedor_Mapa">
+                        <!-- Dibuja el mapa -->                
+                        <div id="vis" class="title"></div>
+                        <!-- Sección de Leyenda -->
+                        <div id="leyenda" class="leyenda-container"></div>
                     </div>
             </div>
         </div>

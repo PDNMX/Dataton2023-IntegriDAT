@@ -1,4 +1,5 @@
 #map {
+    flex: 1;
     margin: 0 auto;
     display: block;
     padding: 0.5rem 0;
@@ -32,9 +33,13 @@ body {
 .container {
     margin-top: 30px;
 }
-
+#contenedor_Mapa{
+    display: flex;
+    flex-direction: row;
+}
 /* Estilos para la leyenda */
 #leyenda {
+    flex: 1;
     background-color: white; /* Fondo blanco */
     border: 1px solid #ddd; /* Borde gris */
     padding: 10px; /* Espaciado interno */
@@ -47,6 +52,26 @@ body {
     /* Estilos adicionales para el contenido de la leyenda */
     /* Puedes ajustar estos estilos según tus preferencias */
 }
+
+#logoHeader {
+    max-width: 85px;
+    /* margin-left: 1497px; */
+    /* padding-top: 15px; */
+    /*
+    margin-left: 80px; 
+    position: relative;
+    width: 100%;
+    margin-left: auto;*/
+}
+#encabezado {
+    /* display: flex; */
+    flex-direction: row;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /*align-items: center;
+    /* margin-left: 12px;
+    padding-left: 15px; */
+} 
 /* .footer {
     background-color: #f8f9fa;
     padding: 20px;
