@@ -8,12 +8,12 @@ const highlightColor = "#5b635b";
 
 const colorDomains = {
   "s1-vs-s3.json": [0, 1, 5, 10, 15, 20],
-  "s6-vs-s3_original.json": [0, 1, 2, 6, 11, 16] // Ajusta el dominio para el otro archivo
+  "s6-vs-s3.json": [0, 1, 2, 6, 11, 16] // Ajusta el dominio para el otro archivo
 };
 
 const colorRanges = {
   "s1-vs-s3.json": ["#808080", "#ffc0cb", "#ffff00", "#ffa500", "#ff0000"],
-  "s6-vs-s3_original.json": ["#cfe8f3", "#ffc0cb", "#ffff00", "#ffa500", "#ff0000"] // Corregido aquí
+  "s6-vs-s3.json": ["#cfe8f3", "#ffc0cb", "#ffff00", "#ffa500", "#ff0000"] // Corregido aquí
 };
 
 
@@ -243,7 +243,7 @@ function changeMap(newMapDataFile) {
   // Asigna la modal actual según el mapa seleccionado
   if (newMapDataFile === 's1-vs-s3.json') {
     currentModal = new bootstrap.Modal(document.getElementById('mapaModal'));
-  } else if (newMapDataFile === 's6-vs-s3_original.json') {
+  } else if (newMapDataFile === 's6-vs-s3.json') {
     currentModal = new bootstrap.Modal(document.getElementById('mapaModal2'));
   }
 
