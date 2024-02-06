@@ -18,17 +18,7 @@
     pointer-events: none;
 }
 
-/* Estilos para el header */
-.navbar-brand svg {
-    height: 30px;
-    width: auto;
-    margin-right: 5px;
-}
-
 /* Estilos para el cuerpo de la página */
-body {
-    font-family: 'Arial', sans-serif;
-}
 
 .container {
     margin-top: 30px;
@@ -53,45 +43,8 @@ body {
     /* Puedes ajustar estos estilos según tus preferencias */
 }
 
-#logoHeader {
-    max-width: 85px;
-    /* margin-left: 1497px; */
-    /* padding-top: 15px; */
-    /*
-    margin-left: 80px; 
-    position: relative;
-    width: 100%;
-    margin-left: auto;*/
-}
-#encabezado {
-    /* display: flex; */
-    flex-direction: row;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    /*align-items: center;
-    /* margin-left: 12px;
-    padding-left: 15px; */
-} 
-/* .footer {
-    background-color: #f8f9fa;
-    padding: 20px;
-    text-align: center;
-} */
-/* Estilo del Header */
 .navbar {
     background: linear-gradient(to right, #3498db, #9b59b6); /* Cambia los colores según tus preferencias */
-}
-
-/* Estilo del Footer */
-.footer {
-    background: linear-gradient(to right, #3498db, #9b59b6); /* Mismos colores que el header */
-}
-
-/* Otros estilos del Footer (puedes ajustarlos según tus necesidades) */
-.footer {
-    padding: 20px;
-    text-align: center;
-    color: #fff; /* Texto en color blanco para mayor contraste */
 }
 
 
