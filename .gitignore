@@ -190,4 +190,4 @@ node_modules/
 mapa/s1-vs-s3.csv
 mapa/v3contrato_durante_inhabilitacion_IntegriDAT.xlsx - Sheet1.csv
 scripts_PDN_Integridat/paso_1_v2_preprocesar_s6_pandas.py
-/scripts_PDN_Integridat/paso_1_v2_preprocesar_s6_pandas.py
+paso_1_v2_preprocesar_s6_pandas.py

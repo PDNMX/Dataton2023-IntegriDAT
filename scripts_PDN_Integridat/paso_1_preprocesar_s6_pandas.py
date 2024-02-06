@@ -9,6 +9,18 @@ tqdm.pandas()
 from itertools import islice
 from pprint import pprint
 
+diccionario_roles = {
+    "buyer": "Comprador",
+    "procuringEntity": "Entidad contratante",
+    "supplier": "Proveedor",
+    "tenderer": "Licitante",
+    "funder": "Financiador",
+    "payer": "Pagador",
+    "payee": "Beneficiario",
+    "reviewBody": "Órgano revisor",
+    "interestedParty": "Parte interesada"
+    }
+
 def parse_date(x):
     try:
         return parse(x)

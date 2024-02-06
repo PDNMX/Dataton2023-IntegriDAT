@@ -2,6 +2,7 @@
 let currentMap;
 let colorDomain; // Declarar la variable a nivel global
 let currentModal; // Declarar la variable a nivel global para la modal actual
+//Claves de entidades federativas que aparecen en el concentrado de los conectados
 const highlightedKeys = ["02","03","04","09","05","06","10","11","12","13","17","18","19","20","22","24","25","26","27","28","30"];
 const highlightColor = "#5b635b"; 
 
