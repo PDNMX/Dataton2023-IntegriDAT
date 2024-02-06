@@ -50,7 +50,7 @@ mask1 = df.earliest_contractPeriod_startDate.between(df.inhabilitacion_fechaInic
 #pprint(mask1)
 mask2 = df.latest_contractPeriod_endDate.between(df.inhabilitacion_fechaInicial, df.inhabilitacion_fechaFinal)
 #pprint(mask2)
-
+8
 final_mask = mask1 | mask2
 df["contrato_durante_inhabilitacion"] = final_mask
 df["contrato_durante_inhabilitacion"] = df["contrato_durante_inhabilitacion"].astype(int)
@@ -61,7 +61,8 @@ df_result[["inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal", "earliest
 columnas_orden = ["sancion_nombre",'tipo_persona', 'sancion_tipoPersona', 'sancion_objetoSocial', 'inhabilitacion_fechaInicial',
                   'inhabilitacion_fechaFinal','earliest_contractPeriod_startDate', 'latest_contractPeriod_endDate', 'parties_name', "parties_contactPoint_name",
                   'ids3', 'expediente', '_id', 'ocid', 'ids6', 'contrato_durante_inhabilitacion',
-                  "procuring_entity", "procuring_entity_region", "procuring_entity_country", "procuring_entity_locality", "procuring_entity_streetAddress"]
+                  "procuring_entity", "procuring_entity_region", "procuring_entity_country", "procuring_entity_locality", "procuring_entity_streetAddress",
+                  "autoridadSancionadora", "institucionDependencia", "causaMotivoHechos"]
 
 """
 columnas_orden = ["sancion_nombre",'tipo_persona', 'sancion_tipoPersona', 'sancion_objetoSocial', 'inhabilitacion_fechaInicial',

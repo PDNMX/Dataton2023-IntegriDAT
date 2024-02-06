@@ -34,7 +34,10 @@ def process_s3p_file(file_path):
         df["inhabilitacion_fechaFinal"] = inhabilitacion.fechaFinal.dt.strftime('%Y-%m-%d')
         df["sancion_nombre"] = df["sancion_nombre"].str.lower()
         df["sancion_nombre"] = df["sancion_nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
-
+        ### Datos necesarios para el mapa
+        df["autoridadSancionadora"] = df["autoridadSancionadora"].str.lower()
+        df["institucionDependencia"] = df.institucionDependencia.apply(lambda x: x['nombre'])
+        df["causaMotivoHechos"] = df["causaMotivoHechos"].str.lower()
         columnas = ["tipoFalta", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
         df = df[columnas]
         df["tipo_persona"] = "particular"
@@ -61,8 +64,11 @@ def process_s3s_file(file_path):
         servidorPublicoSancionado["nombre"] = servidorPublicoSancionado.nombres + " " + servidorPublicoSancionado.primerApellido + " " + servidorPublicoSancionado.segundoApellido
         servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.lower().str.strip()
         servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
-
-        inhabilitacion_servidor.fechaInicial =  inhabilitacion_servidor.fechaInicial.apply(parse_date)
+        ### Datos agregados para complementar el mapa
+        servidorPublicoSancionado["autoridadSancionadora"] = servidorPublicoSancionado["autoridadSancionadora"].str.lower().str.strip()
+        servidorPublicoSancionado["institucionDependencia"] = servidorPublicoSancionado.institucionDependencia.apply(lambda x: x['nombre'])
+        servidorPublicoSancionado["causaMotivoHechos"] = servidorPublicoSancionado["causaMotivoHechos"].str.lower().str.strip()
+        
         inhabilitacion_servidor.fechaFinal = inhabilitacion_servidor.fechaFinal.apply(parse_date)
 
         mask = (~inhabilitacion_servidor.fechaInicial.isna()) & (inhabilitacion_servidor.fechaFinal.isna())  
