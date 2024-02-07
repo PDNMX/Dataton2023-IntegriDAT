@@ -1,6 +1,5 @@
-
-
 function draw(mapDataFile) {
+  const mapaModal = new bootstrap.Modal(document.getElementById("mapaModal"));
   const windowWidth = window.innerWidth;
 
   const width = windowWidth > 1200 ? 1200 : windowWidth;
@@ -31,59 +30,45 @@ function draw(mapDataFile) {
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
-  
-    const colorDomain = [1, 5, 10, 15, 20];
-    const extColorDomain = [1, 5, 10, 15, 20];
-    const legendLabels = [
-      "1 - 5",
-      "5 - 10",
-      "10 - 15",
-      "15 - 20",
-      "20 - 25"
-    ];
-    const colorRange = [
-      "#ffcc00",
-      "#ff9f00",
-      "#ff7900",
-      "#ff4d00",
-      "#ff2400"
-    ];
-  
-    const legend = map
-      .selectAll("g.legend")
-      .data(colorDomain)
-      .enter()
-      .append("g")
-      .attr("class", "legend")
-      .attr("transform", "translate(5,300)");
-  
-    const legendLength = legendLabels.length;
-    const legendBoxSize = 20;
-    const legendMarginTop = height / 10;
-  
-    const color = d3
-      .scaleThreshold()
-      .domain(colorDomain)
-      .range(colorRange);
-  
-    legend
-      .append("rect")
-      .attr("x", 40)
-      .attr("y", (_d, i) => {
-        return (legendLength - i) * legendBoxSize + legendMarginTop;
-      })
-      .attr("width", legendBoxSize)
-      .attr("height", legendBoxSize)
-      .style("fill", color)
-      .style("opacity", 0.8);
-  
-    legend
-      .append("text")
-      .attr("x", 70)
-      .attr("y", (_d, i) => {
-        return (legendLength + 1 - i) * legendBoxSize - 4 + legendMarginTop;
-      })
-      .text((_d, i) => legendLabels[i]);
+
+  const colorDomain = [1, 5, 10, 15, 20];
+  //const extColorDomain = [1, 5, 10, 15, 20];
+  const legendLabels = ["1 - 5", "5 - 10", "10 - 15", "15 - 20", "> 20"];
+  const colorRange = ["#ffcc00", "#ffcc00", "#ff9f00", "#ff7900", "#ff4d00", "#ff2400"];
+
+  const legend = map
+    .selectAll("g.legend")
+    .data(colorDomain)
+    .enter()
+    .append("g")
+    .attr("class", "legend")
+    .attr("transform", "translate(5,300)");
+
+  const legendLength = legendLabels.length;
+  const legendBoxSize = 20;
+  const legendMarginTop = height / 10;
+
+  const color = d3.scaleThreshold().domain(colorDomain).range(colorRange);
+
+  legend
+    .append("rect")
+    .attr("x", 40)
+    .attr("y", (_d, i) => {
+      return (legendLength - i) * legendBoxSize + legendMarginTop;
+    })
+    .attr("width", legendBoxSize)
+    .attr("height", legendBoxSize)
+    .style("fill", color)
+    .style("opacity", 0.8);
+
+  legend
+    .append("text")
+    .style("fill", "#55575a")
+    .attr("x", 70)
+    .attr("y", (_d, i) => {
+      return (legendLength + 1 - i) * legendBoxSize - 4 + legendMarginTop;
+    })
+    .text((_d, i) => legendLabels[i]);
 
   try {
     (async () => {
@@ -105,7 +90,7 @@ function draw(mapDataFile) {
             element.properties.dataInhabilitados = dataInhabilitados;
           }
         });
-    
+
         // Filtra las claves que tienen un valor en totalContratacion
         /* if (element.properties.totalContratacion !== undefined) {
           const index = highlightedKeys.indexOf(element.properties.clave);
@@ -120,67 +105,87 @@ function draw(mapDataFile) {
       const color = d3.scaleThreshold().domain(colorDomain).range(colorRange);
 
       map
-      .selectAll("path")
-      .data(geojson.features)
-      .enter()
-      .append("path")
-      .attr("d", path)
-      .style("stroke", "black")
-      .style("fill", (d) => {
-        const { totalContratacion } = d.properties;
-    
-        // Si el valor es undefined, devuelve el color gris
-        if (totalContratacion === undefined) {
-          return "white"; // o cualquier otro color gris que desees
-        }
-    
-        return color(totalContratacion);
-      }) 
-      
-        .on('click', (_, d) => {
+        .selectAll("path")
+        .data(geojson.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("stroke-width", 1.5)
+        .style("stroke", "#a3a3a3")
+        .style("cursor", (d) => {
+          const { totalContratacion } = d.properties;
+          if (totalContratacion != undefined) {
+            return "pointer"
+          } else {
+            return "not-allowed"
+          }
+
+        })
+        .style("fill", (d) => {
+          const { totalContratacion } = d.properties;
+
+          // Si el valor es undefined, devuelve el color gris
+          if (totalContratacion === undefined) {
+            return "white"; // o cualquier otro color gris que desees
+          }
+
+          return color(totalContratacion);
+        })
+
+        .on("click", (_, d) => {
           const { dataInhabilitados } = d.properties;
-    
+          console.log(dataInhabilitados);
+
           // Obtén el elemento que contiene la lista de inhabilitados en la modal
-          const modalBody = document.querySelector('.modal-body');
-      
+          const modalBody = document.querySelector(".modal-body");
+
           // Limpia el contenido existente en la modal
-          modalBody.innerHTML = '';
-      
+          modalBody.innerHTML = "";
+
           // Itera sobre los datos de inhabilitados y crea elementos para mostrarlos en la modal
           dataInhabilitados.forEach((inhabilitado, index) => {
-              const inhabilitadoElement = document.createElement('div');
-              inhabilitadoElement.innerHTML = `
+            const inhabilitadoElement = document.createElement("div");
+            inhabilitadoElement.innerHTML = `
                   <h2>Persona #${index + 1}</h2>
-                  <p><strong>Nombre:</strong> ${inhabilitado.nombre_declaracion}</p>
-                  <p><strong>Tipo de falta:</strong> ${inhabilitado.tipoFalta}</p>
-                  <p><strong>Tipo de persona:</strong> ${inhabilitado.tipo_persona}</p>
+                  <p><strong>Nombre:</strong> ${
+                    inhabilitado.nombre_declaracion
+                  }</p>
+                  <p><strong>Tipo de falta:</strong> ${
+                    inhabilitado.tipoFalta
+                  }</p>
+                  <p><strong>Tipo de persona:</strong> ${
+                    inhabilitado.tipo_persona
+                  }</p>
                   <!-- Agrega más líneas según las propiedades que quieras mostrar -->
               `;
-              modalBody.appendChild(inhabilitadoElement);
+            modalBody.appendChild(inhabilitadoElement);
           });
-        
-            // Muestra la modal después de llenarla con los datos
-            currentModal = new bootstrap.Modal(document.getElementById('mapaModal'));
-            currentModal.show();
-          
+
+          // Muestra la modal después de llenarla con los datos
+          mapaModal.show();
         })
         .on("mouseover", (event, d) => {
           const { entidad, totalContratacion } = d.properties;
+          let textTooltip;
+          if (totalContratacion != undefined) {
+            textTooltip = `<h5>${entidad}</h5><b>Total Contrataciones Indebidas: <br/>${totalContratacion}</b>`
+          } else {
+            textTooltip = `<h5>${entidad}</h5><b>No hay información</b>`
+          }
           tooltip.transition().duration(300).style("opacity", 0.9);
           tooltip
-            .html(`<b>${entidad}</b><br/><b>Total Contrataciones Indebidas: ${totalContratacion}</b>`)
+            .html(textTooltip)
             .style("left", `${event.pageX - 30}px`)
             .style("top", `${event.pageY - 40}px`);
         })
         .on("mousemove", (event) => {
           tooltip
-            .style("left", `${event.pageX - 30}px`)
-            .style("top", `${event.pageY - 40}px`);
+            .style("left", `${event.pageX + 25}px`)
+            .style("top", `${event.pageY}px`);
         })
         .on("mouseout", () => {
           tooltip.transition().duration(300).style("opacity", 0);
         });
-
     })();
   } catch (e) {
     console.error(e);
@@ -195,11 +200,10 @@ draw("s1-vs-s3.json");
 function changeMap(newMapDataFile) {
   clear();
   draw(newMapDataFile);
-
 }
 
 // Evento de cambio en el menú desplegable
-document.getElementById('mapSelector').addEventListener('change', function () {
+document.getElementById("mapSelector").addEventListener("change", function () {
   const selectedMap = this.value;
   changeMap(selectedMap);
 });
@@ -215,7 +219,7 @@ function handleResize() {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     clear();
-    draw(document.getElementById('mapSelector').value);
+    draw(document.getElementById("mapSelector").value);
   }, 100);
 }
 
