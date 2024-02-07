@@ -121,15 +121,15 @@ function draw(mapDataFile) {
         })
         .on("click", (_, d) => {
           //console.log(mapDataFile);
-          const { dataInhabilitados, entidad } = d.properties;
-          console.log(dataInhabilitados);
+          const { dataInhabilitados, entidad, totalContratacion } = d.properties;
+          //console.log(dataInhabilitados);
 
           // Obtén el elemento que contiene la lista de inhabilitados en la modal
           const accordionFlush = document.getElementById("accordionFlush");
           const modalTitle = document.getElementById("modalTitulo");
           modalTitle.innerHTML = "";
-          modalTitle.innerHTML = entidad;
-
+          modalTitle.innerHTML = `<h4>${entidad}</h4> <h5>Total de contrataciones indebidas: ${totalContratacion}</h5>`;
+          d3.select(".modal-header").style("background", color(totalContratacion));
           // Limpia el contenido existente en la modal
           accordionFlush.innerHTML = "";
 
