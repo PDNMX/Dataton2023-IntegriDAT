@@ -153,8 +153,12 @@ function draw(mapDataFile) {
                           <li><strong>Cargo: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.empleoCargoComision : mapDataFile == 's6-vs-s3.json' ? inhabilitado.puesto : "<i>Dato no proporcionado</i>" }</li>
                           <li><strong>Tipo de falta: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.tipoFalta : "<i>Dato no proporcionado</i>"}</li>
                           <li><strong>Motivo: </strong>${ mapDataFile == 's1-vs-s3.json' || 's6-vs-s3.json' ? inhabilitado.causa_motivo_hechos : "<i>Dato no proporcionado</i>"}</li>
-                          <li><strong>Fecha de contratación: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.fechaTomaPosesion : "<i>Dato no proporcionado</i>"}</li>
-                          <li><strong>Fechas de inhabilitación</strong><ul>
+
+                          ${ mapDataFile == 's1-vs-s3.json' ? `<li><strong>Fecha de contratación: </strong>${inhabilitado.fechaTomaPosesion}`
+                          : mapDataFile == 's6-vs-s3.json' ? `<li><strong>Fechas de contración: </strong><ul><li><strong>Inicial: </strong>${inhabilitado.earliest_contractPeriod_startDate}</li><li><strong>Final: </strong>${inhabilitado.latest_contractPeriod_endDate}</li></ul></li>`
+                          : "<i>Dato no proporcionado</i>"}</li>
+
+                          <li><strong>Fechas de inhabilitación:</strong><ul>
                             <li><strong>Inicial: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.inhabilitacion_fechaInicial : mapDataFile == 's6-vs-s3.json' ? inhabilitado.inhabilitacion_fechaInicial :"<i>Dato no proporcionado</i>"}</li>
                             <li><strong>Final: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.inhabilitacion_fechaFinal : mapDataFile == 's6-vs-s3.json' ? inhabilitado.inhabilitacion_fechaFinal: "<i>Dato no proporcionado</i>"}</li>
                           </ul></li>
