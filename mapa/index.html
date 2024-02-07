@@ -25,13 +25,13 @@
         <div class="row">
             <div class="col-12 text-center">
                 <img class="text-center m-3" src="./iconos/logo.svg" alt="Logo"  height="120" />
-                <h1>Identificador de Contraciones Indebidas</h1>
+                <h1>Identificador de probables contrataciones indebidas</h1>
             </div>
-            <div class="col-12">
-                <p>Selecciona una opción:</p>
+            <div class="col-12 mt-3">
+                <p>Selecciona una opción de probables contrataciones indebidas:</p>
                 <select id="mapSelector" class="form-select form-select-lg" aria-label="Default select example">
-                    <option value="s1-vs-s3.json" selected>Contrataciones indebidas identificadas de personas servidoras públicas</option>
-                    <option value="s6-vs-s3.json">Contrataciones indebidas identificadas de particulares (personas físicas y morales)</option>
+                    <option value="s1-vs-s3.json" selected>Personas servidoras públicas</option>
+                    <option value="s6-vs-s3.json">Particulares (personas físicas y morales)</option>
                 </select>
             </div>
             <div class="col-12 mt-5 text-center">
@@ -41,18 +41,8 @@
             </div>
             <div class="row">
                 <div class="col-12 mt-5 d-flex justify-content-center">
-                    <small>Elaborado con base en la información disponible en los siguientes sistemas de la Plataforma Digital Nacional: 
-                        <ul id="ligasSistemas">
-                            <li>
-                                <a href="https://www.plataformadigitalnacional.org/declaraciones" target="_blank">Sistema 1. Sistema de evolución patrimonial, de declaración de intereses y constancia de presentación de declaración fiscal.</a>
-                            </li>
-                            <li>
-                                <a href="https://www.plataformadigitalnacional.org/sancionados" target="_blank">Sistema 3. Sistema nacional de Servidores públicos y particulares sancionados.</a>
-                            </li>
-                            <li>
-                                <a href="https://www.plataformadigitalnacional.org/contrataciones" target="_blank">Sistema 6. Sistema de Información Pública de Contrataciones.</a>
-                            </li>
-                        </ul>
+                    <small id="txtPie">
+                        
                     </small>
                 </div>
             </div>

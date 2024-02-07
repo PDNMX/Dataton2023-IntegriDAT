@@ -1,4 +1,13 @@
 function draw(mapDataFile) {
+
+  const txtPieMapa = document.getElementById("txtPie");
+  txtPieMapa.innerHTML = "";
+  if (mapDataFile == "s1-vs-s3.json") {
+    txtPieMapa.innerHTML = `<p>Elaborado con base en la información disponible en los siguientes sistemas de la Plataforma Digital Nacional: <ul id="ligasSistemas"> <li> <a href="https://www.plataformadigitalnacional.org/declaraciones" target="_blank">Sistema 1. Sistema de evolución patrimonial, de declaración de intereses y constancia de presentación de declaración fiscal.</a> </li> <li> <a href="https://www.plataformadigitalnacional.org/sancionados" target="_blank">Sistema 3. Sistema nacional de Servidores públicos y particulares sancionados.</a> </li> </ul>`;
+  } if (mapDataFile == "s6-vs-s3.json") {
+    txtPieMapa.innerHTML = `<p>Elaborado con base en la información disponible en los siguientes sistemas de la Plataforma Digital Nacional: <ul id="ligasSistemas"> <li> <a href="https://www.plataformadigitalnacional.org/contrataciones" target="_blank">Sistema 6. Sistema de Información Pública de Contrataciones.</a> </li> <li> <a href="https://www.plataformadigitalnacional.org/sancionados" target="_blank">Sistema 3. Sistema nacional de Servidores públicos y particulares sancionados.</a> </li> </ul>`
+  }
+
   const mapaModal = new bootstrap.Modal(document.getElementById("mapaModal"));
   const windowWidth = window.innerWidth;
 
@@ -122,13 +131,13 @@ function draw(mapDataFile) {
         .on("click", (_, d) => {
           //console.log(mapDataFile);
           const { dataInhabilitados, entidad, totalContratacion } = d.properties;
-          //console.log(dataInhabilitados);
+          console.log(dataInhabilitados);
 
           // Obtén el elemento que contiene la lista de inhabilitados en la modal
           const accordionFlush = document.getElementById("accordionFlush");
           const modalTitle = document.getElementById("modalTitulo");
           modalTitle.innerHTML = "";
-          modalTitle.innerHTML = `<h4>${entidad}</h4> <h5 class="fw-light">Total de contrataciones indebidas: ${totalContratacion}</h5>`;
+          modalTitle.innerHTML = `<h4>${entidad}</h4> <h5 class="fw-light">Total de probables contrataciones indebidas: ${totalContratacion}</h5>`;
           d3.select(".modal-header").style("background", color(totalContratacion));
           // Limpia el contenido existente en la modal
           accordionFlush.innerHTML = "";
@@ -152,6 +161,7 @@ function draw(mapDataFile) {
                           <li style="text-transform: capitalize;"><strong>Nombre: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.nombre_declaracion : inhabilitado.sancion_nombre}</li>
                           <li><strong>Cargo: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.empleoCargoComision : mapDataFile == 's6-vs-s3.json' ? inhabilitado.puesto : "<i>Dato no proporcionado</i>" }</li>
                           <li><strong>Tipo de falta: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.tipoFalta : "<i>Dato no proporcionado</i>"}</li>
+                          <li><strong>Autoridad sancionadora: </strong>${ mapDataFile == 's1-vs-s3.json' || 's6-vs-s3.json' ? inhabilitado.autoridad_sancionadora : "<i>Dato no proporcionado</i>"}</li>
                           <li><strong>Motivo: </strong>${ mapDataFile == 's1-vs-s3.json' || 's6-vs-s3.json' ? inhabilitado.causa_motivo_hechos : "<i>Dato no proporcionado</i>"}</li>
 
                           ${ mapDataFile == 's1-vs-s3.json' ? `<li><strong>Fecha de contratación: </strong>${inhabilitado.fechaTomaPosesion}`
@@ -177,7 +187,7 @@ function draw(mapDataFile) {
           const { entidad, totalContratacion } = d.properties;
           let textTooltip;
           if (totalContratacion != undefined) {
-            textTooltip = `<h5>${entidad}</h5><b>Total Contrataciones Indebidas: <br/>${totalContratacion}</b>`
+            textTooltip = `<h5>${entidad}</h5><b>Total de probables contrataciones indebidas: <br/>${totalContratacion}</b>`
           } else {
             textTooltip = `<h5>${entidad}</h5><b>No hay información</b>`
           }
