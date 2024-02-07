@@ -1,64 +1,9 @@
-// Variable global para almacenar la instancia del mapa actual
-let currentMap;
-let colorDomain; // Declarar la variable a nivel global
-let currentModal; // Declarar la variable a nivel global para la modal actual
-//Claves de entidades federativas que aparecen en el concentrado de los conectados
-const highlightedKeys = ["02","03","04","09","05","06","10","11","12","13","17","18","19","20","22","24","25","26","27","28","30"];
-const highlightColor = "#5b635b"; 
 
-const colorDomains = {
-  "s1-vs-s3.json": [0, 1, 5, 10, 15, 20],
-  "s6-vs-s3.json": [0, 1, 2, 6, 11, 16] // Ajusta el dominio para el otro archivo
-};
-
-const colorRanges = {
-  "s1-vs-s3.json": ["#808080", "#ffc0cb", "#ffff00", "#ffa500", "#ff0000"],
-  "s6-vs-s3.json": ["#cfe8f3", "#ffc0cb", "#ffff00", "#ffa500", "#ff0000"] // Corregido aquí
-};
-
-
-function drawLegend(colorScale, colorDomain) {
-  const legendContainer = d3.select("#leyenda");
-
-  // Elimina cualquier leyenda existente
-  legendContainer.selectAll("*").remove();
-
-  const legend = legendContainer
-    .append("svg")
-    .attr("width", 300)
-    .attr("height", 300);
-
-  const legendWidth = 100;
-  const legendHeight = 60;
-
-  legend
-    .selectAll("rect")
-    .data(colorScale.range())
-    .enter()
-    .append("rect")
-    .attr("x", (_, i) => i * legendWidth)
-    .attr("y", 10)
-    .attr("width", legendWidth)
-    .attr("height", legendHeight)
-    .style("fill", (d) => d);
-
-  legend
-    .selectAll("text")
-    .data(colorScale.range())
-    .enter()
-    .append("text")
-    .attr("x", (_, i) => i * legendWidth)
-    .attr("y", 40)
-    .text((d, i) => {
-      const range = colorScale.invertExtent(d);
-      return `${colorDomain[i]} - ${colorDomain[i + 1]}`;
-    });
-}
 
 function draw(mapDataFile) {
   const windowWidth = window.innerWidth;
 
-  const width = windowWidth > 800 ? 800 : windowWidth;
+  const width = windowWidth > 1200 ? 1200 : windowWidth;
   const height = width / 1.5;
 
   const projection = d3
@@ -68,12 +13,6 @@ function draw(mapDataFile) {
     .translate([width / 2.2, height / 6]);
 
   const path = d3.geoPath().projection(projection);
-
-  // Selecciona el dominio y rango de colores según el mapa actual
-  colorDomain = colorDomains[mapDataFile] || [0, 1, 2]; // Usar la variable global
-  const colorRange = colorRanges[mapDataFile] || ["#adfcad"];
-
-  const color = d3.scaleThreshold().domain(colorDomain).range(colorRange);
 
   // Selecciona el contenedor específico para el mapa
   const mapContainer = d3.select("#vis");
@@ -92,6 +31,59 @@ function draw(mapDataFile) {
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
+  
+    const colorDomain = [1, 5, 10, 15, 20];
+    const extColorDomain = [1, 5, 10, 15, 20];
+    const legendLabels = [
+      "1 - 5",
+      "5 - 10",
+      "10 - 15",
+      "15 - 20",
+      "20 - 25"
+    ];
+    const colorRange = [
+      "#ffcc00",
+      "#ff9f00",
+      "#ff7900",
+      "#ff4d00",
+      "#ff2400"
+    ];
+  
+    const legend = map
+      .selectAll("g.legend")
+      .data(colorDomain)
+      .enter()
+      .append("g")
+      .attr("class", "legend")
+      .attr("transform", "translate(5,300)");
+  
+    const legendLength = legendLabels.length;
+    const legendBoxSize = 20;
+    const legendMarginTop = height / 10;
+  
+    const color = d3
+      .scaleThreshold()
+      .domain(colorDomain)
+      .range(colorRange);
+  
+    legend
+      .append("rect")
+      .attr("x", 40)
+      .attr("y", (_d, i) => {
+        return (legendLength - i) * legendBoxSize + legendMarginTop;
+      })
+      .attr("width", legendBoxSize)
+      .attr("height", legendBoxSize)
+      .style("fill", color)
+      .style("opacity", 0.8);
+  
+    legend
+      .append("text")
+      .attr("x", 70)
+      .attr("y", (_d, i) => {
+        return (legendLength + 1 - i) * legendBoxSize - 4 + legendMarginTop;
+      })
+      .text((_d, i) => legendLabels[i]);
 
   try {
     (async () => {
@@ -124,10 +116,7 @@ function draw(mapDataFile) {
       });
 
       const geojson = topojson.feature(mexico, mexico.objects.collection);
-      const color = d3.scaleThreshold().domain(colorDomain).range(colorRange);
-    
-    /*
-      const geojson = topojson.feature(mexico, mexico.objects.collection);
+      //const color = d3.scaleThreshold().domain(colorDomain).range(colorRange);
       const color = d3.scaleThreshold().domain(colorDomain).range(colorRange);
 
       map
@@ -146,31 +135,8 @@ function draw(mapDataFile) {
         }
     
         return color(totalContratacion);
-      }) */
-      map
-        .selectAll("path")
-        .data(geojson.features)
-        .enter()
-        .append("path")
-        .attr("d", path)
-        .style("stroke", "black")
-        .style("fill", (d) => {
-          const { totalContratacion, clave } = d.properties;
-
-          // Verifica si totalContratacion tiene un valor
-          if (totalContratacion !== undefined && totalContratacion !== 0) {
-            // Utiliza la escala de colores existente para totalContratacion
-            return color(totalContratacion);
-          }
-
-          // Verifica si la clave de entidad está en la lista de claves que deseas resaltar
-          if (highlightedKeys.includes(clave)) {
-            return highlightColor;
-          }
-
-          // Si totalContratacion no tiene un valor y la entidad no está en highlightedKeys, devuelve color gris
-          return "white"; // o cualquier otro color gris que desees
-        })
+      }) 
+      
         .on('click', (_, d) => {
           const { dataInhabilitados } = d.properties;
     
@@ -215,11 +181,6 @@ function draw(mapDataFile) {
           tooltip.transition().duration(300).style("opacity", 0);
         });
 
-      // Almacena la instancia del mapa actual en la variable global
-      currentMap = map;
-
-      // Dibuja la leyenda
-      drawLegend(color, colorDomain);
     })();
   } catch (e) {
     console.error(e);
@@ -235,23 +196,7 @@ function changeMap(newMapDataFile) {
   clear();
   draw(newMapDataFile);
 
-  // Destruye la instancia de la modal actual antes de asignar la nueva
-  if (currentModal) {
-    currentModal.dispose();
-  }
-
-  // Asigna la modal actual según el mapa seleccionado
-  if (newMapDataFile === 's1-vs-s3.json') {
-    currentModal = new bootstrap.Modal(document.getElementById('mapaModal'));
-  } else if (newMapDataFile === 's6-vs-s3.json') {
-    currentModal = new bootstrap.Modal(document.getElementById('mapaModal2'));
-  }
-
-  // Muestra la nueva modal después de asignarla
-  //currentModal.show();
-  drawLegend(color, colorDomain);
 }
-
 
 // Evento de cambio en el menú desplegable
 document.getElementById('mapSelector').addEventListener('change', function () {

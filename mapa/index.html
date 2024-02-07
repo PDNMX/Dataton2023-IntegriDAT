@@ -10,7 +10,7 @@
 
 
 <body>
-    <nav class="navbar bg-body-tertiary"
+    <!-- <nav class="navbar bg-body-tertiary"
         style="background: transparent linear-gradient(230deg, #1C7CBF 0%, #1C7CBF 4%, #9F58E2 49%, #6D4061 100%) 0% 0% !important; z-index: 10;">
         <div class="container-fluid" style="max-width: 1500px !important">
             <a class="navbar-brand" href="https://www.plataformadigitalnacional.org/">
@@ -18,24 +18,24 @@
                     class="d-inline-block align-text-top">
             </a>
         </div>
-    </nav>
+    </nav> -->
 
     <div class="container mt-3 mb-5" style="max-width: 1500px !important">
         <div class="row">
+            <div class="col-12 text-center">
+                <img class="text-center" src="./iconos/logo.svg" alt="Logo"  height="120" />
+                <h1>Identificador de Contraciones Indebidas</h1>
+            </div>
             <div class="col-12">
-                <h1 class="text-center">Identificador de Contraciones Indebidas</h1>
                 <p>Selecciona una opción:</p>
                 <select id="mapSelector" class="form-select form-select-lg" aria-label="Default select example">
                     <option value="s1-vs-s3.json" selected>Contrataciones indebidas identificadas de servidores públicos</option>
                     <option value="s6-vs-s3.json">Contrataciones indebidas identificadas de personas particulares (personas físicas y morales)</option>
                 </select>
             </div>
-            <div class="col-12 mt-5">
-                <div class="contenedor_Mapa" id="contenedor_Mapa">
+            <div class="col-12 mt-5 text-center">
                     <!-- Dibuja el mapa -->
-                    <div id="vis" class="title"></div>
-                    <!-- Sección de Leyenda -->
-                    <div id="leyenda" class="leyenda-container"></div>
+                    <div id="vis"></div>
                 </div>
             </div>
             <div class="row">
