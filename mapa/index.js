@@ -122,7 +122,7 @@ function draw(mapDataFile) {
         .on("click", (_, d) => {
           //console.log(mapDataFile);
           const { dataInhabilitados, entidad, totalContratacion } = d.properties;
-          console.log(dataInhabilitados);
+          //console.log(dataInhabilitados);
 
           // Obtén el elemento que contiene la lista de inhabilitados en la modal
           const accordionFlush = document.getElementById("accordionFlush");
