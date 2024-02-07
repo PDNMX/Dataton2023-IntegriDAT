@@ -122,13 +122,13 @@ function draw(mapDataFile) {
         .on("click", (_, d) => {
           //console.log(mapDataFile);
           const { dataInhabilitados, entidad, totalContratacion } = d.properties;
-          //console.log(dataInhabilitados);
+          console.log(dataInhabilitados);
 
           // Obtén el elemento que contiene la lista de inhabilitados en la modal
           const accordionFlush = document.getElementById("accordionFlush");
           const modalTitle = document.getElementById("modalTitulo");
           modalTitle.innerHTML = "";
-          modalTitle.innerHTML = `<h4>${entidad}</h4> <h5>Total de contrataciones indebidas: ${totalContratacion}</h5>`;
+          modalTitle.innerHTML = `<h4>${entidad}</h4> <h5 class="fw-light">Total de contrataciones indebidas: ${totalContratacion}</h5>`;
           d3.select(".modal-header").style("background", color(totalContratacion));
           // Limpia el contenido existente en la modal
           accordionFlush.innerHTML = "";
@@ -139,7 +139,7 @@ function draw(mapDataFile) {
             inhabilitadoElement.innerHTML = `
                 <div class="accordion-item">
                   <h2 class="accordion-header">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
                           data-bs-target="#flush-${index}" aria-expanded="false"
                           aria-controls="flush-${index}">
                           ${mapDataFile == 's1-vs-s3.json' ? inhabilitado.nombreEntePublico : inhabilitado.procuring_entity}
@@ -150,8 +150,14 @@ function draw(mapDataFile) {
                       <div class="accordion-body">
                         <ul>
                           <li style="text-transform: capitalize;"><strong>Nombre: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.nombre_declaracion : inhabilitado.sancion_nombre}</li>
-                          <li><strong>Cargo: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.empleoCargoComision : "<i>Dato no proporcionado</i>" }</li>
+                          <li><strong>Cargo: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.empleoCargoComision : mapDataFile == 's6-vs-s3.json' ? inhabilitado.puesto : "<i>Dato no proporcionado</i>" }</li>
                           <li><strong>Tipo de falta: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.tipoFalta : "<i>Dato no proporcionado</i>"}</li>
+                          <li><strong>Motivo: </strong>${ mapDataFile == 's1-vs-s3.json' || 's6-vs-s3.json' ? inhabilitado.causa_motivo_hechos : "<i>Dato no proporcionado</i>"}</li>
+                          <li><strong>Fecha de contratación: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.fechaTomaPosesion : "<i>Dato no proporcionado</i>"}</li>
+                          <li><strong>Fechas de inhabilitación</strong><ul>
+                            <li><strong>Inicial: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.inhabilitacion_fechaInicial : mapDataFile == 's6-vs-s3.json' ? inhabilitado.inhabilitacion_fechaInicial :"<i>Dato no proporcionado</i>"}</li>
+                            <li><strong>Final: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.inhabilitacion_fechaFinal : mapDataFile == 's6-vs-s3.json' ? inhabilitado.inhabilitacion_fechaFinal: "<i>Dato no proporcionado</i>"}</li>
+                          </ul></li>
                         <ul>
                       </div>
                   </div>

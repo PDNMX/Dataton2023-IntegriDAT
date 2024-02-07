@@ -47,4 +47,9 @@
     background: linear-gradient(to right, #3498db, #9b59b6); /* Cambia los colores según tus preferencias */
 }
 
+#ligasSistemas a, small {
+    text-decoration: none;
+    color: #15141A;
+}
+
 
