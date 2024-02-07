@@ -19,6 +19,11 @@ function draw(mapDataFile) {
   // Elimina el mapa existente antes de dibujar uno nuevo
   mapContainer.selectAll("svg#map").remove();
 
+  const t = d3.transition()
+    .duration(1500)
+    .ease(d3.easeLinear)
+    .style("fill", "#fff");
+
   const map = mapContainer
     .append("svg")
     .attr("id", "map")
@@ -90,14 +95,6 @@ function draw(mapDataFile) {
             element.properties.dataInhabilitados = dataInhabilitados;
           }
         });
-
-        // Filtra las claves que tienen un valor en totalContratacion
-        /* if (element.properties.totalContratacion !== undefined) {
-          const index = highlightedKeys.indexOf(element.properties.clave);
-          if (index !== -1) {
-            highlightedKeys.splice(index, 1);
-          }
-        } */
       });
 
       const geojson = topojson.feature(mexico, mexico.objects.collection);
@@ -112,6 +109,7 @@ function draw(mapDataFile) {
         .attr("d", path)
         .attr("stroke-width", 1.5)
         .style("stroke", "#a3a3a3")
+        .style("fill", "#fff")
         .style("cursor", (d) => {
           const { totalContratacion } = d.properties;
           if (totalContratacion != undefined) {
@@ -121,44 +119,45 @@ function draw(mapDataFile) {
           }
 
         })
-        .style("fill", (d) => {
-          const { totalContratacion } = d.properties;
-
-          // Si el valor es undefined, devuelve el color gris
-          if (totalContratacion === undefined) {
-            return "white"; // o cualquier otro color gris que desees
-          }
-
-          return color(totalContratacion);
-        })
-
         .on("click", (_, d) => {
-          const { dataInhabilitados } = d.properties;
+          //console.log(mapDataFile);
+          const { dataInhabilitados, entidad } = d.properties;
           console.log(dataInhabilitados);
 
           // Obtén el elemento que contiene la lista de inhabilitados en la modal
-          const modalBody = document.querySelector(".modal-body");
+          const accordionFlush = document.getElementById("accordionFlush");
+          const modalTitle = document.getElementById("modalTitulo");
+          modalTitle.innerHTML = "";
+          modalTitle.innerHTML = entidad;
 
           // Limpia el contenido existente en la modal
-          modalBody.innerHTML = "";
+          accordionFlush.innerHTML = "";
 
           // Itera sobre los datos de inhabilitados y crea elementos para mostrarlos en la modal
           dataInhabilitados.forEach((inhabilitado, index) => {
             const inhabilitadoElement = document.createElement("div");
             inhabilitadoElement.innerHTML = `
-                  <h2>Persona #${index + 1}</h2>
-                  <p><strong>Nombre:</strong> ${
-                    inhabilitado.nombre_declaracion
-                  }</p>
-                  <p><strong>Tipo de falta:</strong> ${
-                    inhabilitado.tipoFalta
-                  }</p>
-                  <p><strong>Tipo de persona:</strong> ${
-                    inhabilitado.tipo_persona
-                  }</p>
-                  <!-- Agrega más líneas según las propiedades que quieras mostrar -->
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                          data-bs-target="#flush-${index}" aria-expanded="false"
+                          aria-controls="flush-${index}">
+                          ${mapDataFile == 's1-vs-s3.json' ? inhabilitado.nombreEntePublico : inhabilitado.procuring_entity}
+                      </button>
+                  </h2>
+                  <div id="flush-${index}" class="accordion-collapse collapse"
+                      data-bs-parent="#accordionFlush">
+                      <div class="accordion-body">
+                        <ul>
+                          <li style="text-transform: capitalize;"><strong>Nombre: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.nombre_declaracion : inhabilitado.sancion_nombre}</li>
+                          <li><strong>Cargo: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.empleoCargoComision : "<i>Dato no proporcionado</i>" }</li>
+                          <li><strong>Tipo de falta: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.tipoFalta : "<i>Dato no proporcionado</i>"}</li>
+                        <ul>
+                      </div>
+                  </div>
+                </div>
               `;
-            modalBody.appendChild(inhabilitadoElement);
+              accordionFlush.appendChild(inhabilitadoElement);
           });
 
           // Muestra la modal después de llenarla con los datos
@@ -175,8 +174,8 @@ function draw(mapDataFile) {
           tooltip.transition().duration(300).style("opacity", 0.9);
           tooltip
             .html(textTooltip)
-            .style("left", `${event.pageX - 30}px`)
-            .style("top", `${event.pageY - 40}px`);
+            .style("left", `${event.pageX + 25}px`)
+            .style("top", `${event.pageY}px`);
         })
         .on("mousemove", (event) => {
           tooltip
@@ -185,7 +184,19 @@ function draw(mapDataFile) {
         })
         .on("mouseout", () => {
           tooltip.transition().duration(300).style("opacity", 0);
-        });
+        })
+
+        .transition(t)
+        .style("fill", (d) => {
+          const { totalContratacion } = d.properties;
+
+          // Si el valor es undefined, devuelve el color gris
+          if (totalContratacion === undefined) {
+            return "white"; // o cualquier otro color gris que desees
+          }
+
+          return color(totalContratacion);
+        })
     })();
   } catch (e) {
     console.error(e);
@@ -225,4 +236,4 @@ function handleResize() {
 
 // Asigna el evento de redimensionamiento
 let resizeTimer;
-window.onresize = handleResize;
+//window.onresize = handleResize;
