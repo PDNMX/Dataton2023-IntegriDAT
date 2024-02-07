@@ -3,10 +3,10 @@ import json
 from dateutil.parser import parse, ParserError
 
 # Carpeta base
-carpeta_base = "datos-pdn/s1/"
-
+carpeta_base = "../s1/"
+carpeta_salida = "../paso_1_s1_salida/"
 # Abrir el archivo de salida en modo de agregar
-with open("s1_fecha_toma_posesion.json", 'a') as f_out:
+with open(carpeta_salida + "s1_fecha_toma_posesion.json", 'a') as f_out:
     # Agregar el corchete de apertura al inicio del archivo
     f_out.write("[\n")
 
@@ -68,3 +68,5 @@ with open("s1_fecha_toma_posesion.json", 'a') as f_out:
     f_out.seek(f_out.tell() - 2, os.SEEK_SET)
     f_out.truncate()
     f_out.write("\n]\n")
+print("Terminado paso 1 del s1")
+print("Guardando archivo de salida")

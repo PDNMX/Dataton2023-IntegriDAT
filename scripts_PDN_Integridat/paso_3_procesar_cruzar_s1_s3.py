@@ -7,16 +7,17 @@ def eliminar_duplicados(df):
     df_sin_duplicados = df.drop_duplicates()
     return df_sin_duplicados
 
+paso_1_s1_salida = "../paso_1_s1_salida/"
 # Leer el archivo JSON con el nuevo formato de fecha
-with open("s1_fecha_toma_posesion.json", 'r') as f:
+with open(paso_1_s1_salida + "s1_fecha_toma_posesion.json", 'r') as f:
     # Cargar el contenido del archivo JSON
     datos_json_s1 = json.load(f)
 
 # Convertir el JSON en un DataFrame de pandas
 s1_posesion = pd.DataFrame(datos_json_s1)
-
+salida_paso1_preprocesar_s3_generar_periodods_invalidez = "../salida_paso1_preprocesar_s3_generar_periodods_invalidez/"
 # Leer el archivo JSON con el nuevo formato de fecha
-with open("inhabilitaciones.json", 'r') as f:
+with open(salida_paso1_preprocesar_s3_generar_periodods_invalidez + "inhabilitaciones.json", 'r') as f:
     # Cargar el contenido del archivo JSON
     datos_json_inhab = json.load(f)
 
@@ -42,8 +43,11 @@ df_final = df_sin_duplicados[df_sin_duplicados['posesion_durante_inhabilitacion'
 
 # Seleccionar columnas relevantes
 columnas_orden = ['nombre_declaracion', 'tipoFalta', 'tipo_persona', 'nivelOrdenGobierno', 'nombreEntePublico', 'empleoCargoComision', 'claveEntidadFederativa', 'expediente', 'fechaTomaPosesion', 
-       'inhabilitacion_fechaInicial', 'inhabilitacion_fechaFinal', 'posesion_durante_inhabilitacion']
+       'inhabilitacion_fechaInicial', 'inhabilitacion_fechaFinal', 'posesion_durante_inhabilitacion',  "puesto","institucion_dependencia", "autoridad_sancionadora", "causa_motivo_hechos"]
 df_final = df_final[columnas_orden]
 
+salida_paso3_resultado_cruzar_s3_s1 = "../salida_paso3_resultado_cruzar_s3_s1/"
 # Guardar el resultado en un archivo JSON
-df_final.to_json("resultado_posesion_inhabilitacion.json", orient="records")
+df_final.to_json(salida_paso3_resultado_cruzar_s3_s1 + "resultado_posesion_inhabilitacion.json", orient="records")
+print("El resultado se guardó en:", salida_paso3_resultado_cruzar_s3_s1 + "resultado_posesion_inhabilitacion.json")
+print("El proceso del cruce del s1 contra los datos del s3 ha terminado")

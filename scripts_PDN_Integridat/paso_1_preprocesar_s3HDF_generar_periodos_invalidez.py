@@ -13,9 +13,20 @@ def parse_date(x):
     except:
         return np.datetime64('NaT')
 
+def extract_puesto(sancionado):
+    if 'puesto' in sancionado:
+        return sancionado['puesto']
+    elif 'nombreRazonSocial' in sancionado:
+        return "No especificado para particulares"
+    else:
+        return ""
+
+
+
+
 def process_s3p_file(file_path):
     try:
-        print(f"Leyendo archivo s3p: {file_path}")
+        print(f"Procesando archivo s3p: {file_path}")
         df = pd.read_json(file_path)
         sancionados = pd.json_normalize(df.particularSancionado)
         inhabilitacion = pd.json_normalize(df.inhabilitacion)
@@ -34,11 +45,13 @@ def process_s3p_file(file_path):
         df["inhabilitacion_fechaFinal"] = inhabilitacion.fechaFinal.dt.strftime('%Y-%m-%d')
         df["sancion_nombre"] = df["sancion_nombre"].str.lower()
         df["sancion_nombre"] = df["sancion_nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
-        ### Datos necesarios para el mapa
-        df["autoridadSancionadora"] = df["autoridadSancionadora"].str.lower()
-        df["institucionDependencia"] = df.institucionDependencia.apply(lambda x: x['nombre'])
-        df["causaMotivoHechos"] = df["causaMotivoHechos"].str.lower()
-        columnas = ["tipoFalta", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
+        df["institucion_dependencia"] = df["institucionDependencia"].apply(lambda x: x.get("nombre", ""))
+        df["autoridad_sancionadora"] = df["autoridadSancionadora"]
+        df["causa_motivo_hechos"] = df["causaMotivoHechos"]
+        # Agregar una columna 'puesto' con un valor predeterminado para particulares
+        df["puesto"] = "No especificado para particulares"
+
+        columnas = ["tipoFalta", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal", "institucion_dependencia", "autoridad_sancionadora", "causa_motivo_hechos"]
         df = df[columnas]
         df["tipo_persona"] = "particular"
 
@@ -49,7 +62,7 @@ def process_s3p_file(file_path):
 
 def process_s3s_file(file_path):
     try:
-        print(f"Leyendo archivo s3s: {file_path}")
+        print(f"Procesando archivo s3s: {file_path}")
         df = pd.read_json(file_path)
         servidorPublicoSancionado = pd.json_normalize(df.servidorPublicoSancionado)
         inhabilitacion_servidor = pd.json_normalize(df.inhabilitacion)
@@ -64,11 +77,18 @@ def process_s3s_file(file_path):
         servidorPublicoSancionado["nombre"] = servidorPublicoSancionado.nombres + " " + servidorPublicoSancionado.primerApellido + " " + servidorPublicoSancionado.segundoApellido
         servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.lower().str.strip()
         servidorPublicoSancionado["nombre"] = servidorPublicoSancionado["nombre"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
-        ### Datos agregados para complementar el mapa
-        servidorPublicoSancionado["autoridadSancionadora"] = servidorPublicoSancionado["autoridadSancionadora"].str.lower().str.strip()
-        servidorPublicoSancionado["institucionDependencia"] = servidorPublicoSancionado.institucionDependencia.apply(lambda x: x['nombre'])
-        servidorPublicoSancionado["causaMotivoHechos"] = servidorPublicoSancionado["causaMotivoHechos"].str.lower().str.strip()
-        
+        """ try:
+            servidorPublicoSancionado["puesto"] = servidorPublicoSancionado.apply(extract_puesto, axis=1)
+        except Exception as e:
+            print(f"Error al extraer el puesto del servidor público: {e}")
+            servidorPublicoSancionado["puesto"] = 'Puesto no especificado' """
+        df["puesto"] = servidorPublicoSancionado["puesto"]
+        df["institucion_dependencia"] = df["institucionDependencia"].apply(lambda x: x.get("nombre", ""))
+        df["autoridad_sancionadora"] = df["autoridadSancionadora"]
+        df["causa_motivo_hechos"] = df["causaMotivoHechos"]
+
+
+        inhabilitacion_servidor.fechaInicial =  inhabilitacion_servidor.fechaInicial.apply(parse_date)
         inhabilitacion_servidor.fechaFinal = inhabilitacion_servidor.fechaFinal.apply(parse_date)
 
         mask = (~inhabilitacion_servidor.fechaInicial.isna()) & (inhabilitacion_servidor.fechaFinal.isna())  
@@ -76,8 +96,8 @@ def process_s3s_file(file_path):
         df["sancion_nombre"] = servidorPublicoSancionado["nombre"]
         df["inhabilitacion_fechaInicial"] = inhabilitacion_servidor.fechaInicial.dt.strftime('%Y-%m-%d')
         df["inhabilitacion_fechaFinal"] = inhabilitacion_servidor.fechaFinal.dt.strftime('%Y-%m-%d')
-
-        columnas = ["tipoFalta", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal"]
+        df["puesto"] = servidorPublicoSancionado["puesto"]
+        columnas = ["tipoFalta", "expediente", "sancion_nombre", "inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal", "puesto","institucion_dependencia", "autoridad_sancionadora", "causa_motivo_hechos"]
         df = df[columnas]
         df["tipo_persona"] = "servidor_publico"
 
@@ -115,5 +135,8 @@ combined_df = pd.concat([s3p_df, s3s_df], ignore_index=True)
 
 # Guardar el DataFrame combinado en un archivo JSON
 salida_paso1_preprocesar_s3_generar_periodods_invalidez = "../salida_paso1_preprocesar_s3_generar_periodods_invalidez/"
-#combined_df.to_json(salida_paso1_preprocesar_s3_generar_periodods_invalidez + "inhabilitaciones.json", orient="records")
-combined_df.to_hdf(salida_paso1_preprocesar_s3_generar_periodods_invalidez + "otros_datos_inhabilitaciones.h5", key="inhabilitaciones", mode="w")
+combined_df.to_json(salida_paso1_preprocesar_s3_generar_periodods_invalidez + "inhabilitaciones.json", orient="records")
+combined_df.to_hdf(salida_paso1_preprocesar_s3_generar_periodods_invalidez + "inhabilitaciones.h5", key="inhabilitaciones", mode="w")
+combined_df.to_csv(salida_paso1_preprocesar_s3_generar_periodods_invalidez + "inhabilitaciones.csv", index=False)
+print("Se ha creado un archivo a partir de combined_df")
+print("Fin del programa paso_1_preprocesar_s3HDF_generar_periodos_invalidez.py")

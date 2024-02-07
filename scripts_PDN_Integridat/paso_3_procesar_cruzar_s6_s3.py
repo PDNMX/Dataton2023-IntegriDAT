@@ -6,7 +6,8 @@ from pprint import pprint
 salida_paso1_preprocesar_s3 = "../salida_paso1_preprocesar_s3_generar_periodods_invalidez/"
 salida_paso2_preprocesar_s6_pandas = "../salida_paso2_preprocesar_s6_pandas/"
 
-s3_inhab = pd.read_pickle(salida_paso1_preprocesar_s3 + "inhabilitaciones.pkl")
+#s3_inhab = pd.read_pickle(salida_paso1_preprocesar_s3 + "inhabilitaciones.pkl")
+s3_inhab = pd.read_hdf(salida_paso1_preprocesar_s3 + "inhabilitaciones.h5")
 #pprint(s3_inhab.columns)
 #pprint(s3_inhab.shape)
 
@@ -58,11 +59,11 @@ df_result = df[final_mask]
 
 df_result[["inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal", "earliest_contractPeriod_startDate", "latest_contractPeriod_endDate"]]
 
-columnas_orden = ["sancion_nombre",'tipo_persona', 'sancion_tipoPersona', 'sancion_objetoSocial', 'inhabilitacion_fechaInicial',
-                  'inhabilitacion_fechaFinal','earliest_contractPeriod_startDate', 'latest_contractPeriod_endDate', 'parties_name', "parties_contactPoint_name",
-                  'ids3', 'expediente', '_id', 'ocid', 'ids6', 'contrato_durante_inhabilitacion',
+columnas_orden = ["sancion_nombre",'tipo_persona', 'inhabilitacion_fechaInicial', 'inhabilitacion_fechaFinal','earliest_contractPeriod_startDate', 'latest_contractPeriod_endDate', 'parties_name', "parties_contactPoint_name",
+                  'expediente', '_id', 'ocid', 'contrato_durante_inhabilitacion',
                   "procuring_entity", "procuring_entity_region", "procuring_entity_country", "procuring_entity_locality", "procuring_entity_streetAddress",
-                  "autoridadSancionadora", "institucionDependencia", "causaMotivoHechos"]
+                   "puesto","institucion_dependencia", "autoridad_sancionadora", "causa_motivo_hechos"]
+
 
 """
 columnas_orden = ["sancion_nombre",'tipo_persona', 'sancion_tipoPersona', 'sancion_objetoSocial', 'inhabilitacion_fechaInicial',
@@ -77,7 +78,7 @@ df_result = df_result.reset_index(drop = True)
 
 df_result = df_result.astype(str)
 salida_paso3_resultado_cruzar_s3_s6 = "../salida_paso3_resultado_cruzar_s3_s6/"
-df_result.to_excel(salida_paso3_resultado_cruzar_s3_s6 + "contrato_durante_inhabilitacion_IntegriDAT.xlsx", index=False)
-df_result.to_json(salida_paso3_resultado_cruzar_s3_s6 + "contrato_durante_inhabilitacion_IntegriDAT.json", orient="records")
+df_result.to_excel(salida_paso3_resultado_cruzar_s3_s6 + "s6-vs-s3.xlsx", index=False)
+df_result.to_json(salida_paso3_resultado_cruzar_s3_s6 + "s6-vs-s3.json", orient="records")
 print("Se ha terminado de cruzar la informacion del s3 y el s6")
 print("El archivo de salida esta en la ruta" + str(salida_paso3_resultado_cruzar_s3_s6))
