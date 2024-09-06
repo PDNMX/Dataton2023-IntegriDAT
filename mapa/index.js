@@ -160,7 +160,7 @@ function draw(mapDataFile) {
                         <ul>
                           <li style="text-transform: capitalize;"><strong>Nombre: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.nombre_declaracion : inhabilitado.sancion_nombre}</li>
                           ${ mapDataFile == 's1-vs-s3.json' ? `<li><strong>Cargo: </strong>${inhabilitado.empleoCargoComision}` : mapDataFile == 's6-vs-s3.json' ? '' : "<i>Dato no proporcionado</i>" }</li>
-                          <li><strong>Tipo de falta: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.tipoFalta : "<i>Dato no proporcionado</i>"}</li>
+                          <li><strong>Tipo de falta: </strong>${ (mapDataFile === 's1-vs-s3.json' && (inhabilitado.tipoFalta.valor ?? "<i>Dato no proporcionado</i>")) || "<i>Dato no proporcionado</i>" }</li>
                           <li><strong>Autoridad sancionadora: </strong>${ mapDataFile == 's1-vs-s3.json' || 's6-vs-s3.json' ? inhabilitado.autoridad_sancionadora : "<i>Dato no proporcionado</i>"}</li>
                           <li><strong>Motivo: </strong>${ mapDataFile == 's1-vs-s3.json' || 's6-vs-s3.json' ? inhabilitado.causa_motivo_hechos : "<i>Dato no proporcionado</i>"}</li>
 
