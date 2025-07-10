@@ -47,11 +47,11 @@ def find_latest_date(dates):
 
 ### Leer ztodos los archivos del S6 en formato parquet
 
-ruta_salida_paso1_s6_pandas = '../salida_paso1_s6_pandas/'
+ruta_salida_paso1_s6_pandas = '/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/cruces_integridat/paso_1_preprocesar_s6_pandas/'
 contenido_salida_paso1_s6_pandas = os.listdir(ruta_salida_paso1_s6_pandas)
 #pprint(contenido_salida_paso1_s6_pandas)
 df_list = []
-salida_paso2_preprocesar_s6_pandas = '../salida_paso2_preprocesar_s6_pandas/'
+salida_paso2_preprocesar_s6_pandas = '/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/cruces_integridat/paso_2_preprocesar_fechas_s6/'
 
 for archivo in contenido_salida_paso1_s6_pandas:
     df = pd.read_parquet(ruta_salida_paso1_s6_pandas + archivo)

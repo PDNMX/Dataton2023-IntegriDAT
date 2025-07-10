@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 from pprint import pprint
 
-salida_paso1_preprocesar_s3 = "../salida_paso1_preprocesar_s3_generar_periodods_invalidez/"
-salida_paso2_preprocesar_s6_pandas = "../salida_paso2_preprocesar_s6_pandas/"
+salida_paso1_preprocesar_s3 = "/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/cruces_integridat/paso_1_preprocesar_s3HDF_generar_periodos_invalidez/"
+salida_paso2_preprocesar_s6_pandas = "/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/cruces_integridat/paso_2_preprocesar_fechas_s6/"
 
 #s3_inhab = pd.read_pickle(salida_paso1_preprocesar_s3 + "inhabilitaciones.pkl")
 s3_inhab = pd.read_hdf(salida_paso1_preprocesar_s3 + "inhabilitaciones.h5")
@@ -61,8 +61,7 @@ df_result[["inhabilitacion_fechaInicial", "inhabilitacion_fechaFinal", "earliest
 
 columnas_orden = ["sancion_nombre",'tipo_persona', 'inhabilitacion_fechaInicial', 'inhabilitacion_fechaFinal','earliest_contractPeriod_startDate', 'latest_contractPeriod_endDate', 'parties_name', "parties_contactPoint_name",
                   'expediente', '_id', 'ocid', 'contrato_durante_inhabilitacion',
-                  "procuring_entity", "procuring_entity_region", "procuring_entity_country", "procuring_entity_locality", "procuring_entity_streetAddress",
-                   "puesto","institucion_dependencia", "autoridad_sancionadora", "causa_motivo_hechos"]
+                  "procuring_entity", "procuring_entity_region", "procuring_entity_country", "procuring_entity_locality", "procuring_entity_streetAddress", "puesto","institucion_dependencia", "autoridad_sancionadora", "causa_motivo_hechos"]
 
 
 """
@@ -77,7 +76,7 @@ df_result = df_result[columnas_orden]
 df_result = df_result.reset_index(drop = True)
 
 df_result = df_result.astype(str)
-salida_paso3_resultado_cruzar_s3_s6 = "../salida_paso3_resultado_cruzar_s3_s6/"
+salida_paso3_resultado_cruzar_s3_s6 = "/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/cruces_integridat/paso_3_procesar_cruzar_s6_s3/"
 df_result.to_excel(salida_paso3_resultado_cruzar_s3_s6 + "s6-vs-s3.xlsx", index=False)
 df_result.to_json(salida_paso3_resultado_cruzar_s3_s6 + "s6-vs-s3.json", orient="records")
 print("Se ha terminado de cruzar la informacion del s3 y el s6")

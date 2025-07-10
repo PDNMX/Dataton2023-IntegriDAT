@@ -40,6 +40,7 @@ def find_dates_no_processing(awards):
         return start_dates, end_dates
     else:
         return [], []
+
 def extract_parties_names(parties):
     if type(parties) is dict:
         name = parties.get("name")
@@ -74,7 +75,6 @@ def extraer_S6(df):
     df = df[keep_cols]
     res = df.awards.map(find_dates_no_processing)
     df["contractPeriod_startDate"], df["contractPeriod_endDate"] = zip(*res)
-    #df.loc[:, "contractPeriod_startDate"], df.loc[:, "contractPeriod_endDate"] = zip(*res)
     df = df.drop(columns=["awards"])
     df = df.explode("parties")
     res_contact = df.parties.map(extract_parties_names)
@@ -86,13 +86,33 @@ def extraer_S6(df):
     df = df.reset_index(drop = True)
     return df
 
-
+def procesar_estructura_anidada(df_raw):
+    """
+    Procesa la nueva estructura anidada donde los datos están en 'record'
+    """
+    records = []
+    
+    for index, row in df_raw.iterrows():
+        # Extraer datos del record
+        record_data = row.get('record', {})
+        
+        # Agregar información del nivel superior
+        record_data['metadata'] = row.get('metadata', {})
+        record_data['_id_original'] = row.get('_id', {})
+        
+        records.append(record_data)
+    
+    # Crear DataFrame con los records procesados
+    df_processed = pd.DataFrame(records)
+    
+    return df_processed
 
 def convert_files_parquet_h5(df, directorio_salida, nombre_archivo, i):
     try:
         nombre_archivo = nombre_archivo.split(".")[0]
         df.to_parquet(directorio_salida+str(nombre_archivo)+"_parquet_" + str(i) + ".parquet")
     except Exception as e:
+        print(f"Error al guardar parquet: {e}")
         nombre_archivo = nombre_archivo.split(".")[0]
         df.to_hdf(directorio_salida +str(nombre_archivo) + "_s6_hdf_" + str(i) + ".h5", key = "s6_df")
 
@@ -101,51 +121,88 @@ def convert_files_h5_parquet(df, directorio_salida, nombre_archivo, i):
         nombre_archivo = nombre_archivo.split(".")[0]
         df.to_hdf(directorio_salida +str(nombre_archivo) + "_s6_hdf_" + str(i) + ".h5", key = "s6_df")
     except Exception as e:
+        print(f"Error al guardar HDF5: {e}")
         nombre_archivo = nombre_archivo.split(".")[0]
         df.to_parquet(directorio_salida+str(nombre_archivo)+"_parquet_" + str(i) + ".parquet")
 
+def procesar_archivo(ruta_archivo, nombre_archivo, directorio_salida, i):
+    """
+    Procesa un archivo individual con la nueva estructura
+    """
+    try:
+        # Leer el archivo JSON
+        df_raw = pd.read_json(ruta_archivo)
+        print(f"Archivo leído: {nombre_archivo}, Shape original: {df_raw.shape}")
+        
+        # Procesar la estructura anidada
+        df_processed = procesar_estructura_anidada(df_raw)
+        print(f"Después de procesar estructura: {df_processed.shape}")
+        
+        # Verificar que tenemos las columnas necesarias
+        columnas_necesarias = ['_id', 'ocid', 'id', 'parties', 'awards']
+        columnas_faltantes = [col for col in columnas_necesarias if col not in df_processed.columns]
+        
+        if columnas_faltantes:
+            print(f"Advertencia: Columnas faltantes en {nombre_archivo}: {columnas_faltantes}")
+            # Agregar columnas faltantes con valores vacíos
+            for col in columnas_faltantes:
+                df_processed[col] = None
+        
+        # Aplicar el procesamiento S6
+        df_s6 = extraer_S6(df_processed)
+        print(f"Después de extraer S6: {df_s6.shape}")
+        
+        # Guardar el archivo procesado
+        convert_files_parquet_h5(df_s6, directorio_salida, nombre_archivo, i)
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error procesando archivo {nombre_archivo}: {e}")
+        return False
 
 ### Leer por carpeta o directorio y nombre de archivo o json
-### Se iterqa sobre el directorio
-ruta_bulk_s6_nombres = '../bulk-s6'
+### Se itera sobre el directorio
+ruta_bulk_s6_nombres = '/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/s6/output'
 contenido_ruta_bulk_s6 = os.listdir(ruta_bulk_s6_nombres)
-salida_preprocesamiento_s6 = '../salida_paso1_s6_pandas/'
-pprint(ruta_bulk_s6_nombres)
+salida_preprocesamiento_s6 = '/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/cruces_integridat/paso_1_preprocesar_s6_pandas/'
+
+print("Ruta de entrada:", ruta_bulk_s6_nombres)
+print("Ruta de salida:", salida_preprocesamiento_s6)
+
+# Crear directorio de salida si no existe
+os.makedirs(salida_preprocesamiento_s6, exist_ok=True)
+
+archivos_procesados = 0
+archivos_con_error = 0
 
 for i in range(len(contenido_ruta_bulk_s6)):
-    #print("Iteracion: ", i)
-    ##solo para listar lo que se itera
-    ##print("Archivo: ", contenido_ruta_bulk_s6[i])
-    if os.path.isfile(ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i]) == True:
-        #print("Es un archivo")
-        nombre_archivo = contenido_ruta_bulk_s6[i]
-        #print("Archivo: ", nombre_archivo)
-        ruta_archivo = ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i]
-        #rint("Ruta archivo: ", ruta_archivo)
-        df = pd.read_json(ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i])
-        #pprint(df.shape)
-        df = extraer_S6(df)
-        convert_files_parquet_h5(df, salida_preprocesamiento_s6, nombre_archivo, i)
-        ##convert_files_h5_parquet(df, salida_preprocesamiento_s6, nombre_archivo, i)
+    elemento = contenido_ruta_bulk_s6[i]
+    ruta_elemento = os.path.join(ruta_bulk_s6_nombres, elemento)
+    
+    if os.path.isfile(ruta_elemento):
+        print(f"\nProcesando archivo: {elemento}")
+        if procesar_archivo(ruta_elemento, elemento, salida_preprocesamiento_s6, i):
+            archivos_procesados += 1
+        else:
+            archivos_con_error += 1
+    
+    elif os.path.isdir(ruta_elemento):
+        print(f"\nProcesando directorio: {elemento}")
+        contenido_subdirectorio = os.listdir(ruta_elemento)
+        
+        for j, archivo_sub in enumerate(contenido_subdirectorio):
+            ruta_archivo_sub = os.path.join(ruta_elemento, archivo_sub)
+            
+            if os.path.isfile(ruta_archivo_sub):
+                print(f"  Procesando archivo en subdirectorio: {archivo_sub}")
+                if procesar_archivo(ruta_archivo_sub, archivo_sub, salida_preprocesamiento_s6, j):
+                    archivos_procesados += 1
+                else:
+                    archivos_con_error += 1
 
-    if os.path.isdir(ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i]) == True:
-        pass
-        #print("Es un directorio")
-        ## listar el contenido del subdirectorio
-        contenido_subdirectorio = os.listdir(ruta_bulk_s6_nombres +'/'+contenido_ruta_bulk_s6[i])
-        x=0
-        #print("Contenido subdirectorio: ", contenido_subdirectorio)
-        for j in range(len(contenido_subdirectorio)):
-            #print("Iteracion subdirectorio: ", j)
-            #print("Archivo: ", contenido_subdirectorio[j])
-            nombre_archivo_subdirectorio = ruta_bulk_s6_nombres +'/'+ contenido_ruta_bulk_s6[i] + '/'+ contenido_subdirectorio[j]
-            df = pd.read_json(nombre_archivo_subdirectorio)
-            #pprint(df.shape)
-            df = extraer_S6(df)
-            convert_files_parquet_h5(df, salida_preprocesamiento_s6, contenido_subdirectorio[j], j)
-            ##convert_files_h5_parquet(df, salida_preprocesamiento_s6, contenido_subdirectorio[j], j)
-            #pprint(contenido_subdirectorio[j])
-            #df = pd.read_json(contenido_subdirectorio[j], lines=True)
-            #print("Tamaño del dataframe: ", df.shape)
-print("Obtencion de las nuevas columnas del S6")
-pprint("Fin del preproceso de los archivos del S6")
+print(f"\n=== RESUMEN ===")
+print(f"Archivos procesados correctamente: {archivos_procesados}")
+print(f"Archivos con error: {archivos_con_error}")
+print("Obtención de las nuevas columnas del S6")
+print("Fin del preproceso de los archivos del S6")

@@ -1,11 +1,11 @@
 function draw(mapDataFile) {
-
   const txtPieMapa = document.getElementById("txtPie");
   txtPieMapa.innerHTML = "";
   if (mapDataFile == "s1-vs-s3.json") {
     txtPieMapa.innerHTML = `<p>Elaborado con base en la información disponible en los siguientes sistemas de la Plataforma Digital Nacional: </p><ul id="ligasSistemas"> <li> <a href="https://www.plataformadigitalnacional.org/declaraciones" target="_blank">Sistema 1. Sistema de evolución patrimonial, de declaración de intereses y constancia de presentación de declaración fiscal.</a> </li> <li> <a href="https://www.plataformadigitalnacional.org/sancionados" target="_blank">Sistema 3. Sistema nacional de Servidores públicos y particulares sancionados.</a> </li> </ul>`;
-  } if (mapDataFile == "s6-vs-s3.json") {
-    txtPieMapa.innerHTML = `<p>Elaborado con base en la información disponible en los siguientes sistemas de la Plataforma Digital Nacional: </p><ul id="ligasSistemas"> <li> <a href="https://www.plataformadigitalnacional.org/contrataciones" target="_blank">Sistema 6. Sistema de Información Pública de Contrataciones.</a> </li> <li> <a href="https://www.plataformadigitalnacional.org/sancionados" target="_blank">Sistema 3. Sistema nacional de Servidores públicos y particulares sancionados.</a> </li> </ul>`
+  }
+  if (mapDataFile == "s6-vs-s3.json") {
+    txtPieMapa.innerHTML = `<p>Elaborado con base en la información disponible en los siguientes sistemas de la Plataforma Digital Nacional: </p><ul id="ligasSistemas"> <li> <a href="https://www.plataformadigitalnacional.org/contrataciones" target="_blank">Sistema 6. Sistema de Información Pública de Contrataciones.</a> </li> <li> <a href="https://www.plataformadigitalnacional.org/sancionados" target="_blank">Sistema 3. Sistema nacional de Servidores públicos y particulares sancionados.</a> </li> </ul>`;
   }
 
   const mapaModal = new bootstrap.Modal(document.getElementById("mapaModal"));
@@ -28,7 +28,8 @@ function draw(mapDataFile) {
   // Elimina el mapa existente antes de dibujar uno nuevo
   mapContainer.selectAll("svg#map").remove();
 
-  const t = d3.transition()
+  const t = d3
+    .transition()
     .duration(1500)
     .ease(d3.easeLinear)
     .style("fill", "#fff");
@@ -48,7 +49,14 @@ function draw(mapDataFile) {
   const colorDomain = [1, 5, 10, 15, 20];
   //const extColorDomain = [1, 5, 10, 15, 20];
   const legendLabels = ["1 - 5", "5 - 10", "10 - 15", "15 - 20", "> 20"];
-  const colorRange = ["#ffcc00", "#ffcc00", "#ff9f00", "#ff7900", "#ff4d00", "#ff2400"];
+  const colorRange = [
+    "#ffcc00",
+    "#ffcc00",
+    "#ff9f00",
+    "#ff7900",
+    "#ff4d00",
+    "#ff2400",
+  ];
 
   const legend = map
     .selectAll("g.legend")
@@ -87,7 +95,7 @@ function draw(mapDataFile) {
   try {
     (async () => {
       const mexico = await d3.json(
-        "https://raw.githubusercontent.com/PDNMX/viz-cuestionario-estados/master/data/mexico.json",
+        "https://raw.githubusercontent.com/PDNMX/viz-cuestionario-estados/master/data/mexico.json"
       );
 
       const dataS1vsS3 = await d3.json(mapDataFile);
@@ -122,15 +130,15 @@ function draw(mapDataFile) {
         .style("cursor", (d) => {
           const { totalContratacion } = d.properties;
           if (totalContratacion != undefined) {
-            return "pointer"
+            return "pointer";
           } else {
-            return "not-allowed"
+            return "not-allowed";
           }
-
         })
         .on("click", (_, d) => {
           //console.log(mapDataFile);
-          const { dataInhabilitados, entidad, totalContratacion } = d.properties;
+          const { dataInhabilitados, entidad, totalContratacion } =
+            d.properties;
           console.log(dataInhabilitados);
 
           // Obtén el elemento que contiene la lista de inhabilitados en la modal
@@ -138,7 +146,10 @@ function draw(mapDataFile) {
           const modalTitle = document.getElementById("modalTitulo");
           modalTitle.innerHTML = "";
           modalTitle.innerHTML = `<h4>${entidad}</h4> <h5 class="fw-light">Total de probables contrataciones indebidas: ${totalContratacion}</h5>`;
-          d3.select(".modal-header").style("background", color(totalContratacion));
+          d3.select(".modal-header").style(
+            "background",
+            color(totalContratacion)
+          );
           // Limpia el contenido existente en la modal
           accordionFlush.innerHTML = "";
 
@@ -151,33 +162,77 @@ function draw(mapDataFile) {
                       <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
                           data-bs-target="#flush-${index}" aria-expanded="false"
                           aria-controls="flush-${index}">
-                          ${mapDataFile == 's1-vs-s3.json' ? inhabilitado.nombreEntePublico : inhabilitado.procuring_entity}
+                          ${
+                            mapDataFile == "s1-vs-s3.json"
+                              ? inhabilitado.nombreEntePublico
+                              : inhabilitado.procuring_entity
+                          }
                       </button>
                   </h2>
                   <div id="flush-${index}" class="accordion-collapse collapse"
                       data-bs-parent="#accordionFlush">
                       <div class="accordion-body">
                         <ul>
-                          <li style="text-transform: capitalize;"><strong>Nombre: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.nombre_declaracion : inhabilitado.sancion_nombre}</li>
-                          ${ mapDataFile == 's1-vs-s3.json' ? `<li><strong>Cargo: </strong>${inhabilitado.empleoCargoComision}` : mapDataFile == 's6-vs-s3.json' ? '' : "<i>Dato no proporcionado</i>" }</li>
-                          <li><strong>Tipo de falta: </strong>${ (mapDataFile === 's1-vs-s3.json' && inhabilitado.tipoFalta && inhabilitado.tipoFalta.valor) ? inhabilitado.tipoFalta.valor : "<i>Dato no proporcionado</i>" }</li>
-                          <li><strong>Autoridad sancionadora: </strong>${ mapDataFile == 's1-vs-s3.json' || 's6-vs-s3.json' ? inhabilitado.autoridad_sancionadora : "<i>Dato no proporcionado</i>"}</li>
-                          <li><strong>Motivo: </strong>${ mapDataFile == 's1-vs-s3.json' || 's6-vs-s3.json' ? inhabilitado.causa_motivo_hechos : "<i>Dato no proporcionado</i>"}</li>
+                          <li style="text-transform: capitalize;"><strong>Nombre: </strong>${
+                            mapDataFile == "s1-vs-s3.json"
+                              ? inhabilitado.nombre_declaracion
+                              : inhabilitado.sancion_nombre
+                          }</li>
+                          ${
+                            mapDataFile == "s1-vs-s3.json"
+                              ? `<li><strong>Cargo: </strong>${inhabilitado.empleoCargoComision}`
+                              : mapDataFile == "s6-vs-s3.json"
+                              ? ""
+                              : "<i>Dato no proporcionado</i>"
+                          }</li>
+                          <li><strong>Tipo de falta: </strong>${
+                            mapDataFile === "s1-vs-s3.json" &&
+                            inhabilitado.tipoFalta &&
+                            inhabilitado.tipoFalta.valor
+                              ? inhabilitado.tipoFalta.valor
+                              : "<i>Dato no proporcionado</i>"
+                          }</li>
+                          <li><strong>Autoridad sancionadora: </strong>${
+                            mapDataFile == "s1-vs-s3.json" || "s6-vs-s3.json"
+                              ? inhabilitado.autoridad_sancionadora
+                              : "<i>Dato no proporcionado</i>"
+                          }</li>
+                          <li><strong>Motivo: </strong>${
+                            mapDataFile == "s1-vs-s3.json" || "s6-vs-s3.json"
+                              ? inhabilitado.causa_motivo_hechos
+                              : "<i>Dato no proporcionado</i>"
+                          }</li>
 
-                          ${ mapDataFile == 's1-vs-s3.json' ? `<li><strong>Fecha de contratación: </strong>${inhabilitado.fechaTomaPosesion}`
-                          : mapDataFile == 's6-vs-s3.json' ? `<li><strong>Fechas de contratación: </strong><ul><li><strong>Inicial: </strong>${inhabilitado.earliest_contractPeriod_startDate}</li><li><strong>Final: </strong>${inhabilitado.latest_contractPeriod_endDate}</li></ul></li>`
-                          : "<i>Dato no proporcionado</i>"}</li>
+                          ${
+                            mapDataFile == "s1-vs-s3.json"
+                              ? `<li><strong>Fecha de contratación: </strong>${inhabilitado.fechaTomaPosesion}`
+                              : mapDataFile == "s6-vs-s3.json"
+                              ? `<li><strong>Fechas de contratación: </strong><ul><li><strong>Inicial: </strong>${inhabilitado.earliest_contractPeriod_startDate}</li><li><strong>Final: </strong>${inhabilitado.latest_contractPeriod_endDate}</li></ul></li>`
+                              : "<i>Dato no proporcionado</i>"
+                          }</li>
 
                           <li><strong>Fechas de inhabilitación:</strong><ul>
-                            <li><strong>Inicial: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.inhabilitacion_fechaInicial : mapDataFile == 's6-vs-s3.json' ? inhabilitado.inhabilitacion_fechaInicial :"<i>Dato no proporcionado</i>"}</li>
-                            <li><strong>Final: </strong>${ mapDataFile == 's1-vs-s3.json' ? inhabilitado.inhabilitacion_fechaFinal : mapDataFile == 's6-vs-s3.json' ? inhabilitado.inhabilitacion_fechaFinal: "<i>Dato no proporcionado</i>"}</li>
+                            <li><strong>Inicial: </strong>${
+                              mapDataFile == "s1-vs-s3.json"
+                                ? inhabilitado.inhabilitacion_fechaInicial
+                                : mapDataFile == "s6-vs-s3.json"
+                                ? inhabilitado.inhabilitacion_fechaInicial
+                                : "<i>Dato no proporcionado</i>"
+                            }</li>
+                            <li><strong>Final: </strong>${
+                              mapDataFile == "s1-vs-s3.json"
+                                ? inhabilitado.inhabilitacion_fechaFinal
+                                : mapDataFile == "s6-vs-s3.json"
+                                ? inhabilitado.inhabilitacion_fechaFinal
+                                : "<i>Dato no proporcionado</i>"
+                            }</li>
                           </ul></li>
                         <ul>
                       </div>
                   </div>
                 </div>
               `;
-              accordionFlush.appendChild(inhabilitadoElement);
+            accordionFlush.appendChild(inhabilitadoElement);
           });
 
           // Muestra la modal después de llenarla con los datos
@@ -187,9 +242,9 @@ function draw(mapDataFile) {
           const { entidad, totalContratacion } = d.properties;
           let textTooltip;
           if (totalContratacion != undefined) {
-            textTooltip = `<h5>${entidad}</h5><b>Total de probables contrataciones indebidas: <br/>${totalContratacion}</b>`
+            textTooltip = `<h5>${entidad}</h5><b>Total de probables contrataciones indebidas: <br/>${totalContratacion}</b>`;
           } else {
-            textTooltip = `<h5>${entidad}</h5><b>No hay información</b>`
+            textTooltip = `<h5>${entidad}</h5><b>No hay información</b>`;
           }
           tooltip.transition().duration(300).style("opacity", 0.9);
           tooltip
@@ -216,7 +271,7 @@ function draw(mapDataFile) {
           }
 
           return color(totalContratacion);
-        })
+        });
     })();
   } catch (e) {
     console.error(e);

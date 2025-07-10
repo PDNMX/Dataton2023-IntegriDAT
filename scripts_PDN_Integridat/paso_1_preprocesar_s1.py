@@ -3,8 +3,8 @@ import json
 from dateutil.parser import parse, ParserError
 
 # Carpeta base
-carpeta_base = "../s1/"
-carpeta_salida = "../paso_1_s1_salida/"
+carpeta_base = "/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/s1/output/"#"../s1/"
+carpeta_salida = "/home/phoenix/sesna/desarrollo/otros/bulk_datos_sergio_09_07_2025/cruces_integridat/paso_1_preprocesar_s1/"
 # Abrir el archivo de salida en modo de agregar
 with open(carpeta_salida + "s1_fecha_toma_posesion.json", 'a') as f_out:
     # Agregar el corchete de apertura al inicio del archivo
